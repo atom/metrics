@@ -1,2 +1,0 @@
-'main': './lib/metrics'
-'activationEvents': ['metrics:toggle']

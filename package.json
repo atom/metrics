@@ -1,0 +1,19 @@
+{
+  "name": "metrics",
+  "main": "./lib/metrics",
+  "version": "0.1.0",
+  "description": "Reports basic usage metrics",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atom/metrics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/atom/metrics/issues"
+  },
+  "engines": {
+    "atom": ">25.0"
+  },
+  "publishConfig": {
+    "registry": "https://atom.iriscouch.com/registry/_design/app/_rewrite"
+  }
+}
