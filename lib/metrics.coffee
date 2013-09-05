@@ -1,6 +1,9 @@
+Collector = require './collector'
+
 module.exports =
   activate: (state) ->
-    console.log "Activate"
+    @collector = new Collector()
+    @collector.log(action: 'activate')
 
   deactivate: ->
-    console.log "Deactivate"
+    @collector.log(action: 'deactivate')
