@@ -8,7 +8,9 @@ describe "Collector", ->
 
   describe "getData", ->
     it "creates a request with the proper options", ->
-      keys = _.keys(subject.getData())
+      data = subject.getData()
+      keys = _.keys(data)
+
       expect(keys).toContain 'user_agent'
       expect(keys).toContain 'screen_resolution'
       expect(keys).toContain 'pixel_ratio'
@@ -16,3 +18,6 @@ describe "Collector", ->
       expect(keys).toContain 'window_path'
       expect(keys).toContain 'session_id'
       expect(keys).toContain 'actor_login'
+
+      expect(keys).toContain 'packages'
+      expect(data['packages']).not.toBe undefined

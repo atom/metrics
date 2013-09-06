@@ -41,6 +41,10 @@ module.exports =
       }`
       takenFromOctolytics()
 
+    # Private
+    getPackages: ->
+      _.keys(atom.activePackages)
+
     # Public: Returns an object containing all data collected.
     getData: (additionalData) ->
       data =
@@ -51,4 +55,5 @@ module.exports =
         screen_resolution: @getScreenResolution()
         pixel_ratio: @getPixelRatio()
         browser_resolution: @getBrowserResolution()
+        packages: @getPackages()
       _.extend(data, additionalData)
