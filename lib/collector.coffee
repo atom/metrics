@@ -17,14 +17,38 @@ module.exports =
     getSessionId: ->
       @sessionId
 
+    # Private
+    getUserAgent: ->
+      navigator.userAgent
+
+    # Private
+    getScreenResolution: ->
+      screen.width + "x" + screen.height
+
+    # Private
+    getPixelRatio: ->
+      window.devicePixelRatio
+
+    # Private
+    getBrowserResolution: ->
+      takenFromOctolytics = `function() {
+        var e, t, n, r;
+        try {
+            return t = 0, e = 0, typeof window.innerWidth == "number" ? (t = window.innerWidth, e = window.innerHeight) : ((n = document.documentElement) != null ? n.clientWidth : void 0) != null ? (t = document.documentElement.clientWidth, e = document.documentElement.clientHeight) : ((r = document.body) != null ? r.clientWidth : void 0) != null && (t = document.body.clientWidth, e = document.body.clientHeight), t + "x" + e
+        } catch (i) {
+            return "unknown"
+        }
+      }`
+      takenFromOctolytics()
+
     # Public: Returns an object containing all data collected.
     getData: (additionalData) ->
       data =
         window_path: @getPath()
         session_id: @getSessionId()
         actor_login: @getUser()
-        user_agent: 'Atom v25.0.0'
-        screen_resolution: '2560x1440'
-        pixel_ratio: 1
-        browser_resolution: '1360x923'
+        user_agent: @getUserAgent()
+        screen_resolution: @getScreenResolution()
+        pixel_ratio: @getPixelRatio()
+        browser_resolution: @getBrowserResolution()
       _.extend(data, additionalData)

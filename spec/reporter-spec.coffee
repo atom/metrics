@@ -1,6 +1,6 @@
 Reporter = require '../lib/reporter'
 
-fdescribe "Reporter", ->
+describe "Reporter", ->
   subject = null
   beforeEach ->
     subject = new Reporter

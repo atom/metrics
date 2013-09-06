@@ -1,6 +1,6 @@
 metrics = require '../lib/metrics'
 
-fdescribe "Metrics", ->
+describe "Metrics", ->
   describe "upon loading", ->
     beforeEach ->
       spyOn(metrics.reporter, 'send')
