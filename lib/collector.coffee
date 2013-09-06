@@ -5,24 +5,26 @@ module.exports =
     constructor: ->
       @sessionId = new Date().getTime()
 
-    # Public: Logs out the data that will be sent.
-    log: ->
-      console.debug JSON.stringify(@getData())
-
     # Private
     getPath: ->
       global.project.getPath()
 
-    # Public: Returns the name of the currently logged in user.
+    # Private
     getUser: ->
       process.env.USER
 
+    # Private
     getSessionId: ->
       @sessionId
 
     # Public: Returns an object containing all data collected.
     getData: (additionalData) ->
       data =
-        windowPath: @getPath()
-        sessionId: @getSessionId()
+        window_path: @getPath()
+        session_id: @getSessionId()
+        actor_login: @getUser()
+        user_agent: 'Atom v25.0.0'
+        screen_resolution: '2560x1440'
+        pixel_ratio: 1
+        browser_resolution: '1360x923'
       _.extend(data, additionalData)

@@ -1,13 +1,15 @@
-require './octolytics'
+request = require 'request'
 
 module.exports =
   class Reporter
-    constructor: (event, user, data) ->
-      window._octo.setApp('atom')
-      window._octo.setHost('collector-staging.githubapp.com')
+    constructor: ->
+      @request = request
 
-      window._octo.setActor
-        login: user
+    send: (data) ->
+      params = timestamp: new Date().getTime()
+      for key, value of data
+        params["dimensions[#{key}]"] = value
 
-      window._octo.setDimensions(data)
-      window._octo.push([event])
+      @request
+        url: "https://collector-staging.githubapp.com/atom/page_view"
+        qs: params

@@ -13,6 +13,9 @@
   "engines": {
     "atom": ">25.0"
   },
+  "dependencies": {
+    "request": "2.27.0"
+  },
   "publishConfig": {
     "registry": "https://atom.iriscouch.com/registry/_design/app/_rewrite"
   }

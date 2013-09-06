@@ -2,11 +2,11 @@ Collector = require './collector'
 Reporter = require './reporter'
 
 module.exports =
+  collector: new Collector()
+  reporter: new Reporter()
+
   activate: (state) ->
-    @collector = new Collector()
-    # FIXME: you have to use 'recordPageView'
-    new Reporter('recordPageView', @collector.getUser(), @collector.getData())
+    @reporter.send(@collector.getData(action: 'activate'))
 
   deactivate: ->
-    # FIXME: you have to use 'recordPageView'
-    new Reporter('recordPageView', @collector.getUser(), @collector.getData())
+    @reporter.send(@collector.getData(action: 'deactivate'))
