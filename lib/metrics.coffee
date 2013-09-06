@@ -1,9 +1,12 @@
 Collector = require './collector'
+Reporter = require './reporter'
 
 module.exports =
   activate: (state) ->
     @collector = new Collector()
-    @collector.log(action: 'activate')
+    # FIXME: you have to use 'recordPageView'
+    new Reporter('recordPageView', @collector.getUser(), @collector.getData())
 
   deactivate: ->
-    @collector.log(action: 'deactivate')
+    # FIXME: you have to use 'recordPageView'
+    new Reporter('recordPageView', @collector.getUser(), @collector.getData())

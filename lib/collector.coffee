@@ -6,24 +6,23 @@ module.exports =
       @sessionId = new Date().getTime()
 
     # Public: Logs out the data that will be sent.
-    log: (additionalData) ->
-      console.debug JSON.stringify(@getData(additionalData))
+    log: ->
+      console.debug JSON.stringify(@getData())
 
     # Private
     getPath: ->
       global.project.getPath()
 
-    # Private
-    getUsername: ->
+    # Public: Returns the name of the currently logged in user.
+    getUser: ->
       process.env.USER
 
     getSessionId: ->
       @sessionId
 
-    # Private
-    getData: (additionalData)->
+    # Public: Returns an object containing all data collected.
+    getData: (additionalData) ->
       data =
         windowPath: @getPath()
-        username: @getUsername()
         sessionId: @getSessionId()
       _.extend(data, additionalData)
