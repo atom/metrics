@@ -10,7 +10,6 @@ describe "Collector", ->
     beforeEach ->
 
     it "creates a request with the proper options", ->
-      console.log subject.getData()
       keys = _.keys(subject.getData())
       expect(keys).toContain 'user_agent'
       expect(keys).toContain 'screen_resolution'
