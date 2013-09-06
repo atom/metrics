@@ -7,8 +7,6 @@ describe "Collector", ->
     subject = new Collector
 
   describe "getData", ->
-    beforeEach ->
-
     it "creates a request with the proper options", ->
       keys = _.keys(subject.getData())
       expect(keys).toContain 'user_agent'
