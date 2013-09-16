@@ -31,15 +31,23 @@ module.exports =
 
     # Private
     getBrowserResolution: ->
-      takenFromOctolytics = `function() {
-        var e, t, n, r;
-        try {
-            return t = 0, e = 0, typeof window.innerWidth == "number" ? (t = window.innerWidth, e = window.innerHeight) : ((n = document.documentElement) != null ? n.clientWidth : void 0) != null ? (t = document.documentElement.clientWidth, e = document.documentElement.clientHeight) : ((r = document.body) != null ? r.clientWidth : void 0) != null && (t = document.body.clientWidth, e = document.body.clientHeight), t + "x" + e
-        } catch (i) {
-            return "unknown"
-        }
-      }`
-      takenFromOctolytics()
+      try
+        width = 0
+        height = 0
+
+        if typeof window.innerWidth is 'number'
+          width  = window.innerWidth
+          height = window.innerHeight
+        else if document.documentElement?.clientWidth?
+          width  = document.documentElement.clientWidth
+          height = document.documentElement.clientHeight
+        else if document.body?.clientWidth?
+          width  = document.body.clientWidth
+          height = document.body.clientHeight
+
+        width + 'x' + height
+      catch e
+        'unknown'
 
     # Private
     getPackages: ->
