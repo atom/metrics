@@ -5,11 +5,13 @@ module.exports =
     constructor: ->
       @request = request
 
-    send: (data) ->
+    send: (eventType, data) ->
       params = timestamp: new Date().getTime()
-      for key, value of data
-        params["dimensions[#{key}]"] = value
+      params.dimensions = data
 
       @request
-        url: "https://collector.githubapp.com/atom/page_view"
-        qs: params
+        method: 'POST'
+        url: "https://collector.githubapp.com/atom/#{eventType}"
+        headers:
+          'Content-Type' : 'application/json; charset=utf-8'
+        body: JSON.stringify(params)
