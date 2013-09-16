@@ -11,5 +11,5 @@ module.exports =
         params["dimensions[#{key}]"] = value
 
       @request
-        url: "https://collector-staging.githubapp.com/atom/page_view"
+        url: "https://collector.githubapp.com/atom/page_view"
         qs: params
