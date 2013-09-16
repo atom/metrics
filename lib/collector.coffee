@@ -63,5 +63,5 @@ module.exports =
         screen_resolution: @getScreenResolution()
         pixel_ratio: @getPixelRatio()
         browser_resolution: @getBrowserResolution()
-        packages: @getPackages()
+        packages: JSON.stringify(@getPackages())
       _.extend(data, additionalData)
