@@ -6,7 +6,7 @@ module.exports =
       @request = request
 
     send: (eventType, data) ->
-      params = timestamp: new Date().getTime()
+      params = timestamp: ((new Date().getTime()) / 1000)
       params.dimensions = data
 
       @request
