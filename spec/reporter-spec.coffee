@@ -14,6 +14,6 @@ describe "Reporter", ->
       expect(subject.request).toHaveBeenCalled()
       expect(subject.request.calls[0].args[0].method).toBe 'POST'
       expect(subject.request.calls[0].args[0].url).toBe 'https://collector.githubapp.com/atom/event'
-      expect(subject.request.calls[0].args[0].headers['Content-Type']).toBe 'application/json; charset=utf-8'
+      expect(subject.request.calls[0].args[0].headers['Content-Type']).toBe 'application/vnd.github-octolytics+json'
       expect(subject.request.calls[0].args[0].body).toContain '"dimensions":{"key":"value"}'
       expect(subject.request.calls[0].args[0].body).toContain '"timestamp":'

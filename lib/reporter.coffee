@@ -13,5 +13,5 @@ module.exports =
         method: 'POST'
         url: "https://collector.githubapp.com/atom/#{eventType}"
         headers:
-          'Content-Type' : 'application/json; charset=utf-8'
+          'Content-Type' : 'application/vnd.github-octolytics+json'
         body: JSON.stringify(params)
