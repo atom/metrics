@@ -20,4 +20,4 @@ describe "Collector", ->
       expect(keys).toContain 'actor_login'
 
       expect(keys).toContain 'packages'
-      expect(data['packages']).not.toBe undefined
+      expect(data.packages).toEqual '[]'

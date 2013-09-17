@@ -6,7 +6,7 @@ module.exports =
   reporter: new Reporter()
 
   activate: (state) ->
-    @reporter.send(@collector.getData(action: 'activate'))
+    @reporter.send('activate', @collector.getData())
 
   deactivate: ->
-    @reporter.send(@collector.getData(action: 'deactivate'))
+    @reporter.send('deactivate', @collector.getData())

@@ -5,11 +5,13 @@ module.exports =
     constructor: ->
       @request = request
 
-    send: (data) ->
-      params = timestamp: new Date().getTime()
-      for key, value of data
-        params["dimensions[#{key}]"] = value
+    send: (eventType, data) ->
+      params = timestamp: ((new Date().getTime()) / 1000)
+      params.dimensions = data
 
       @request
-        url: "https://collector-staging.githubapp.com/atom/page_view"
-        qs: params
+        method: 'POST'
+        url: "https://collector.githubapp.com/atom/#{eventType}"
+        headers:
+          'Content-Type' : 'application/vnd.github-octolytics+json'
+        body: JSON.stringify(params)
