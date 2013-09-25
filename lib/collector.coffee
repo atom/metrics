@@ -50,8 +50,8 @@ module.exports =
         'unknown'
 
     # Private
-    getPackages: ->
-      _.keys(atom.activePackages)
+    getPackageNames: ->
+      _.pluck(atom.getActivePackages(), 'name')
 
     # Public: Returns an object containing all data collected.
     getData: (additionalData) ->
