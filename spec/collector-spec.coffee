@@ -21,3 +21,18 @@ describe "Collector", ->
 
       expect(keys).toContain 'packages'
       expect(data.packages).toEqual '[]'
+
+      expect(keys).toContain 'themes'
+      expect(data.packages).toEqual '[]'
+
+    describe "with a package", ->
+      beforeEach ->
+        atom.loadPackage('metrics')
+        atom.activatePackage('metrics')
+
+      it "creates a request with package data", ->
+        data = subject.getData()
+        packages = JSON.parse(data.packages)
+        expect(packages[0].name).toEqual 'metrics'
+        expect(packages[0].loadTime).toBeDefined
+        expect(packages[0].activateTime).toBeDefined

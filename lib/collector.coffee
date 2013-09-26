@@ -50,8 +50,18 @@ module.exports =
         'unknown'
 
     # Private
-    getPackageNames: ->
-      _.pluck(atom.getActivePackages(), 'name')
+    getPackageData: ->
+      atom.getLoadedPackages().map (pack) ->
+        name: pack.name
+        loadTime: pack.loadTime
+        activateTime: pack.activateTime
+
+    # Private
+    getThemeData: ->
+      atom.themes.getLoadedThemes().map (theme) ->
+        name: theme.name
+        loadTime: theme.loadTime
+        activateTime: theme.activateTime
 
     # Public: Returns an object containing all data collected.
     getData: (additionalData) ->
@@ -63,5 +73,6 @@ module.exports =
         screen_resolution: @getScreenResolution()
         pixel_ratio: @getPixelRatio()
         browser_resolution: @getBrowserResolution()
-        packages: JSON.stringify(@getPackageNames())
+        packages: JSON.stringify(@getPackageData())
+        themes: JSON.stringify(@getThemeData())
       _.extend(data, additionalData)
