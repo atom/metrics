@@ -1,5 +1,3 @@
-_ = require 'underscore'
-
 module.exports =
   class Collector
     constructor: ->
@@ -63,16 +61,17 @@ module.exports =
         loadTime: theme.loadTime
         activateTime: theme.activateTime
 
-    # Public: Returns an object containing all data collected.
-    getData: (additionalData) ->
-      data =
-        window_path: @getPath()
-        session_id: @getSessionId()
-        actor_login: @getUser()
-        user_agent: @getUserAgent()
-        screen_resolution: @getScreenResolution()
-        pixel_ratio: @getPixelRatio()
-        browser_resolution: @getBrowserResolution()
-        packages: JSON.stringify(@getPackageData())
-        themes: JSON.stringify(@getThemeData())
-      _.extend(data, additionalData)
+    # Public: Returns an object containing data with only simple values.
+    getDimensions: () ->
+      window_path: @getPath()
+      session_id: @getSessionId()
+      actor_login: @getUser()
+      user_agent: @getUserAgent()
+      screen_resolution: @getScreenResolution()
+      pixel_ratio: @getPixelRatio()
+      browser_resolution: @getBrowserResolution()
+
+    # Public: Returns an object containing data with complex (nested) values.
+    getContext: () ->
+        packages: @getPackageData()
+        themes: @getThemeData()

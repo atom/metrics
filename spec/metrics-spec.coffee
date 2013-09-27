@@ -9,7 +9,8 @@ describe "Metrics", ->
     it "reports a page view", ->
       expect(metrics.reporter.send).toHaveBeenCalled()
       expect(metrics.reporter.send.calls[0].args[0]).toEqual 'activate'
-      expect(metrics.reporter.send.calls[0].args[1]).toEqual metrics.collector.getData()
+      expect(metrics.reporter.send.calls[0].args[1]).toEqual metrics.collector.getDimensions()
+      expect(metrics.reporter.send.calls[0].args[2]).toEqual metrics.collector.getContext()
 
   describe "upon unloading", ->
     beforeEach ->
@@ -19,4 +20,5 @@ describe "Metrics", ->
     it "reports a page view", ->
       expect(metrics.reporter.send).toHaveBeenCalled()
       expect(metrics.reporter.send.calls[0].args[0]).toEqual 'deactivate'
-      expect(metrics.reporter.send.calls[0].args[1]).toEqual metrics.collector.getData()
+      expect(metrics.reporter.send.calls[0].args[1]).toEqual metrics.collector.getDimensions()
+      expect(metrics.reporter.send.calls[0].args[2]).toEqual metrics.collector.getContext()

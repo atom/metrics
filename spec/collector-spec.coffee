@@ -6,10 +6,10 @@ describe "Collector", ->
   beforeEach ->
     subject = new Collector
 
-  describe "getData", ->
-    it "creates a request with the proper options", ->
-      data = subject.getData()
-      keys = _.keys(data)
+  describe "getDimensions", ->
+    it "collects several basic attributes", ->
+      dimensions = subject.getDimensions()
+      keys = _.keys(dimensions)
 
       expect(keys).toContain 'user_agent'
       expect(keys).toContain 'screen_resolution'
@@ -19,20 +19,14 @@ describe "Collector", ->
       expect(keys).toContain 'session_id'
       expect(keys).toContain 'actor_login'
 
-      expect(keys).toContain 'packages'
-      expect(data.packages).toEqual '[]'
-
-      expect(keys).toContain 'themes'
-      expect(data.packages).toEqual '[]'
-
-    describe "with a package", ->
+  describe "getContext", ->
+    describe "with an activated package", ->
       beforeEach ->
         atom.loadPackage('metrics')
         atom.activatePackage('metrics')
 
       it "creates a request with package data", ->
-        data = subject.getData()
-        packages = JSON.parse(data.packages)
-        expect(packages[0].name).toEqual 'metrics'
-        expect(packages[0].loadTime).toBeDefined
-        expect(packages[0].activateTime).toBeDefined
+        context = subject.getContext()
+        expect(context.packages[0].name).toEqual 'metrics'
+        expect(context.packages[0].loadTime).toBeDefined
+        expect(context.packages[0].activateTime).toBeDefined
