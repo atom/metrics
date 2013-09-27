@@ -24,6 +24,8 @@ describe "Collector", ->
       beforeEach ->
         atom.loadPackage('metrics')
         atom.activatePackage('metrics')
+        pack = atom.getLoadedPackage('metrics')
+        spyOn(atom, 'getLoadedPackages').andReturn([pack])
 
       it "creates a request with package data", ->
         context = subject.getContext()
