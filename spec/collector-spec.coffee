@@ -1,4 +1,4 @@
-_ = require 'underscore'
+{_} = require 'atom'
 Collector = require '../lib/collector'
 
 describe "Collector", ->
