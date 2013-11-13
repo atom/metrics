@@ -1,11 +1,9 @@
 Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
-  beforeEach ->
+  it "creates an activation event", ->
     spyOn(Reporter, 'request')
     atom.packages.activatePackage('metrics')
-
-  it "creates a request with the proper options", ->
     expect(Reporter.request).toHaveBeenCalled()
 
     requestArgs = Reporter.request.calls[0].args[0]
@@ -18,9 +16,14 @@ describe "Metrics", ->
     expect(body.context).toBeDefined()
     expect(body.timestamp).toBeDefined()
 
-    Reporter.request.reset()
-
+  it "creates an deactivate", ->
+    atom.packages.activatePackage('metrics')
+    spyOn(Reporter, 'request')
     atom.packages.deactivatePackage('metrics')
     expect(Reporter.request).toHaveBeenCalled()
+
     requestArgs = Reporter.request.calls[0].args[0]
+    body = JSON.parse(requestArgs.body)
     expect(requestArgs.url).toBe 'https://collector.githubapp.com/atom/deactivate'
+    expect(body.dimensions).toBeDefined()
+    expect(body.measures.session_length).toBeGreaterThan 0

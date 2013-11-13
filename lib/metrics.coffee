@@ -1,10 +1,10 @@
 Reporter = require './reporter'
-guid = require 'guid'
 
 module.exports =
-  activate: (state) ->
-    @sessionId = guid.create().toString()
-    Reporter.send('activate', @sessionId)
+  activate: ({sessionLength}) ->
+    @sessionStart = new Date().getTime()
+    Reporter.sendDeactivateEvent(sessionLength) if sessionLength
+    Reporter.sendActivateEvent()
 
-  deactivate: ->
-    Reporter.send('deactivate', @sessionId)
+  serialize: ->
+    sessionLength: new Date().getTime() - @sessionStart
