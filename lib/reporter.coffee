@@ -11,7 +11,7 @@ module.exports =
           user_agent: navigator.userAgent
           screen_resolution: screen.width + "x" + screen.height
           pixel_ratio: window.devicePixelRatio
-          version: atom.version
+          version: atom.getVersion()
         context:
           packages: @getPackageData()
           themes: @getThemeData()
@@ -24,7 +24,7 @@ module.exports =
         dimensions:
           actor_login: process.env.USER
           user_agent: navigator.userAgent
-          version: atom.version
+          version: atom.getVersion()
         measures:
           session_length: sessionLength
 
