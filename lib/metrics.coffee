@@ -1,12 +1,10 @@
-Collector = require './collector'
 Reporter = require './reporter'
+guid = require 'guid'
 
 module.exports =
-  collector: new Collector()
-  reporter: new Reporter()
-
   activate: (state) ->
-    @reporter.send('activate', @collector.getDimensions(), @collector.getContext())
+    @sessionId = guid.create().toString()
+    Reporter.send('activate', @sessionId)
 
   deactivate: ->
-    @reporter.send('deactivate', @collector.getDimensions(), @collector.getContext())
+    Reporter.send('deactivate', @sessionId)

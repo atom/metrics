@@ -1,24 +1,26 @@
-metrics = require '../lib/metrics'
+Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
-  describe "upon loading", ->
-    beforeEach ->
-      spyOn(metrics.reporter, 'send')
-      metrics.activate()
+  beforeEach ->
+    spyOn(Reporter, 'request')
+    atom.packages.activatePackage('metrics')
 
-    it "reports a page view", ->
-      expect(metrics.reporter.send).toHaveBeenCalled()
-      expect(metrics.reporter.send.calls[0].args[0]).toEqual 'activate'
-      expect(metrics.reporter.send.calls[0].args[1]).toEqual metrics.collector.getDimensions()
-      expect(metrics.reporter.send.calls[0].args[2]).toEqual metrics.collector.getContext()
+  it "creates a request with the proper options", ->
+    expect(Reporter.request).toHaveBeenCalled()
 
-  describe "upon unloading", ->
-    beforeEach ->
-      spyOn(metrics.reporter, 'send')
-      metrics.deactivate()
+    requestArgs = Reporter.request.calls[0].args[0]
+    body = JSON.parse(requestArgs.body)
 
-    it "reports a page view", ->
-      expect(metrics.reporter.send).toHaveBeenCalled()
-      expect(metrics.reporter.send.calls[0].args[0]).toEqual 'deactivate'
-      expect(metrics.reporter.send.calls[0].args[1]).toEqual metrics.collector.getDimensions()
-      expect(metrics.reporter.send.calls[0].args[2]).toEqual metrics.collector.getContext()
+    expect(requestArgs.method).toBe 'POST'
+    expect(requestArgs.url).toBe 'https://collector.githubapp.com/atom/activate'
+    expect(requestArgs.headers['Content-Type']).toBe 'application/vnd.github-octolytics+json'
+    expect(body.dimensions).toBeDefined()
+    expect(body.context).toBeDefined()
+    expect(body.timestamp).toBeDefined()
+
+    Reporter.request.reset()
+
+    atom.packages.deactivatePackage('metrics')
+    expect(Reporter.request).toHaveBeenCalled()
+    requestArgs = Reporter.request.calls[0].args[0]
+    expect(requestArgs.url).toBe 'https://collector.githubapp.com/atom/deactivate'
