@@ -1,7 +1,7 @@
 {
   "name": "metrics",
   "main": "./lib/metrics",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Reports basic usage metrics",
   "repository": {
     "type": "git",
