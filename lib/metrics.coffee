@@ -2,9 +2,9 @@ Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
-    @sessionStart = new Date().getTime()
+    @sessionStart = Date.now()
     Reporter.sendDeactivateEvent(sessionLength) if sessionLength
     Reporter.sendActivateEvent()
 
   serialize: ->
-    sessionLength: new Date().getTime() - @sessionStart
+    sessionLength: Date.now() - @sessionStart
