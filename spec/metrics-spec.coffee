@@ -1,7 +1,7 @@
 Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
-  it "creates an activation event", ->
+  it "reports activation events", ->
     spyOn(Reporter, 'request')
     atom.packages.activatePackage('metrics')
     expect(Reporter.request).toHaveBeenCalled()
@@ -16,7 +16,7 @@ describe "Metrics", ->
     expect(body.context).toBeDefined()
     expect(body.timestamp).toBeDefined()
 
-  it "creates an deactivate", ->
+  it "reports deactivation events", ->
     atom.packages.activatePackage('metrics')
     spyOn(Reporter, 'request')
     atom.packages.deactivatePackage('metrics')
