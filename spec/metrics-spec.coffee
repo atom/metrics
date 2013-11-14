@@ -20,7 +20,8 @@ describe "Metrics", ->
     atom.packages.activatePackage('metrics')
     spyOn(Reporter, 'request')
     atom.packages.deactivatePackage('metrics')
-    expect(Reporter.request).toHaveBeenCalled()
+    atom.packages.activatePackage('metrics')
+    expect(Reporter.request.callCount).toBe 2
 
     requestArgs = Reporter.request.calls[0].args[0]
     body = JSON.parse(requestArgs.body)
