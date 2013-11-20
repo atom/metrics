@@ -43,7 +43,7 @@ module.exports =
 
     # Private
     @getPackageData: ->
-      atom.getLoadedPackages().map (pack) ->
+      atom.packages.getLoadedPackages().map (pack) ->
         name: pack.name
         loadTime: pack.loadTime
         activateTime: pack.activateTime
