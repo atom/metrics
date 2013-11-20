@@ -4,7 +4,7 @@ module.exports =
   class Reporter
     @sendActivateEvent: ->
       params =
-        timestamp: new Date().getTime() / 1000
+        timestamp: Date.now() / 1000
         dimensions:
           window_path: atom.project.getPath()
           actor_login: process.env.USER
@@ -20,7 +20,7 @@ module.exports =
 
     @sendDeactivateEvent: (sessionLength) ->
       params =
-        timestamp: new Date().getTime() / 1000
+        timestamp: Date.now() / 1000
         dimensions:
           actor_login: process.env.USER
           user_agent: navigator.userAgent
