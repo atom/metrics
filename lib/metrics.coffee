@@ -2,7 +2,8 @@ Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
-    @showMetricsDialog() unless atom.config.get('metrics.sendData')?
+    # Don't prompt for permission until Atom is released.
+    # @showMetricsDialog() unless atom.config.get('metrics.sendData')?
 
     if atom.config.get('metrics.sendData')
       @sessionStart = Date.now()
