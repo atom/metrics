@@ -3,12 +3,11 @@ Reporter = require '../lib/reporter'
 describe "Metrics", ->
   describe "when metrics are enabled", ->
     beforeEach ->
-      spyOn(atom, 'confirm').andReturn(0)
+      atom.config.set('metrics.sendData', true)
 
     it "reports activation events", ->
       spyOn(Reporter, 'request')
       atom.packages.activatePackage('metrics')
-      expect(atom.confirm).toHaveBeenCalled()
       expect(Reporter.request).toHaveBeenCalled()
 
       requestArgs = Reporter.request.calls[0].args[0]
@@ -36,12 +35,11 @@ describe "Metrics", ->
 
   describe "when metrics are disabled", ->
     beforeEach ->
-      spyOn(atom, 'confirm').andReturn(1)
+      atom.config.set('metrics.sendData', false)
 
     it "reports activation events", ->
       spyOn(Reporter, 'request')
       atom.packages.activatePackage('metrics')
-      expect(atom.confirm).toHaveBeenCalled()
       expect(Reporter.request).not.toHaveBeenCalled()
 
     it "reports deactivation events", ->
