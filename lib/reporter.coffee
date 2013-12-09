@@ -1,3 +1,4 @@
+os = require 'os'
 request = require 'request'
 
 module.exports =
@@ -12,6 +13,8 @@ module.exports =
           screen_resolution: screen.width + "x" + screen.height
           pixel_ratio: window.devicePixelRatio
           version: atom.getVersion()
+          cpus: os.cpus()?.length ? 0
+          memory: os.totalmem() ? 0
         context:
           packages: @getPackageData()
           themes: @getThemeData()
