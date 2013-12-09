@@ -1,5 +1,3 @@
-Reporter = require './reporter'
-
 module.exports =
   configDefaults:
     sendData: true
@@ -10,8 +8,10 @@ module.exports =
 
     if atom.config.get('metrics.sendData')
       @sessionStart = Date.now()
-      Reporter.sendDeactivateEvent(sessionLength) if sessionLength
-      Reporter.sendActivateEvent()
+      process.nextTick ->
+        Reporter = require './reporter'
+        Reporter.sendDeactivateEvent(sessionLength) if sessionLength
+        Reporter.sendActivateEvent()
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
