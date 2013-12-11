@@ -7,7 +7,7 @@ module.exports =
       params =
         timestamp: Date.now() / 1000
         dimensions:
-          window_path: atom.project.getPath()
+          window_path: atom.project?.getPath()
           actor_login: process.env.USER
           user_agent: navigator.userAgent
           screen_resolution: screen.width + "x" + screen.height
