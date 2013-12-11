@@ -15,6 +15,7 @@ module.exports =
           version: atom.getVersion()
           cpus: os.cpus()?.length ? 0
           memory: os.totalmem() ? 0
+          window_load_time: atom.getWindowLoadTime() ? 0
         context:
           packages: @getPackageData()
           themes: @getThemeData()
