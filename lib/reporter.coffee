@@ -1,60 +1,44 @@
+# 
+
 os = require 'os'
 request = require 'request'
+{_} = require 'atom'
 
 module.exports =
   class Reporter
-    @sendActivateEvent: ->
+    @defaultParams: ->
+      v: 1
+      tid: "UA-3769691-33"
+      cid: atom.config.get('metrics.userId')
+      an: 'atom'
+      av: atom.getVersion()
+      sr: screen.width + "x" + screen.height
+
+    @sendStartedEvent: ->
       params =
-        timestamp: Date.now() / 1000
-        dimensions:
-          window_path: atom.project?.getPath()
-          actor_login: process.env.USER
-          user_agent: navigator.userAgent
-          screen_resolution: screen.width + "x" + screen.height
-          pixel_ratio: window.devicePixelRatio
-          version: atom.getVersion()
-          cpus: os.cpus()?.length ? 0
-          memory: os.totalmem() ? 0
-          window_load_time: atom.getWindowLoadTime() ? 0
-        context:
-          packages: @getPackageData()
-          themes: @getThemeData()
+        t: 'event'
+        ec: 'session'
+        ea: 'started'
+          
+      @send(params)
 
-      @send('activate', params)
-
-    @sendDeactivateEvent: (sessionLength) ->
+    @sendEndedEvent: (sessionLength) ->
       params =
-        timestamp: Date.now() / 1000
-        dimensions:
-          actor_login: process.env.USER
-          user_agent: navigator.userAgent
-          version: atom.getVersion()
-        measures:
-          session_length: sessionLength
+        t: 'event'
+        ec: 'session'
+        ea: 'ended'
+        ev: sessionLength
 
-      @send('deactivate', params)
+      @send(params)
 
-    @send: (eventType, params) ->
+    @send: (params) ->
+      _.extend(params, @defaultParams())
+      
       @request
         method: 'POST'
-        url: "https://collector.githubapp.com/atom/#{eventType}"
-        headers: 'Content-Type' : 'application/vnd.github-octolytics+json'
-        body: JSON.stringify(params)
+        url: "https://www.google-analytics.com/collect"
+        qs: params
 
     # Private
     @request: (options) ->
       request options, -> # Callback prevents errors from going to the console
-
-    # Private
-    @getPackageData: ->
-      atom.packages.getLoadedPackages().map (pack) ->
-        name: pack.name
-        loadTime: pack.loadTime
-        activateTime: pack.activateTime
-
-    # Private
-    @getThemeData: ->
-      atom.themes.getLoadedThemes().map (theme) ->
-        name: theme.name
-        loadTime: theme.loadTime
-        activateTime: theme.activateTime
