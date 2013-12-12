@@ -10,6 +10,7 @@ module.exports =
       Reporter = require './reporter'
       Reporter.sendEndedEvent(sessionLength) if sessionLength
       Reporter.sendStartedEvent()
+      Reporter.sendLoadTimeEvent()
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart

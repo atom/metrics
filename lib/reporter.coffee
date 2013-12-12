@@ -1,5 +1,3 @@
-# 
-
 os = require 'os'
 request = require 'request'
 {_} = require 'atom'
@@ -29,6 +27,15 @@ module.exports =
         ea: 'ended'
         ev: sessionLength
 
+      @send(params)
+      
+    @sendLoadTimeEvent: ->
+      params =
+        t: 'timing'
+        utc: 'app'
+        utv: 'load'
+        utt: atom.getWindowLoadTime()
+          
       @send(params)
 
     @send: (params) ->
