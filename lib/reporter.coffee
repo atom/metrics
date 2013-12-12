@@ -38,9 +38,16 @@ module.exports =
           
       @send(params)
 
+    @sendEditorAppView: ->
+      params =
+        t: 'appview'
+        cd: 'editor'
+
+      @send(params)
+
     @send: (params) ->
       _.extend(params, @defaultParams())
-      
+
       @request
         method: 'POST'
         url: "https://www.google-analytics.com/collect"

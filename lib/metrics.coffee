@@ -9,6 +9,8 @@ module.exports =
       Reporter.sendEndedEvent(sessionLength) if sessionLength
       Reporter.sendStartedEvent()
       Reporter.sendLoadTimeEvent()
+      atom.workspaceView.on 'editor:attached', (event, editorView) ->
+        Reporter.sendEditorAppView()
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
