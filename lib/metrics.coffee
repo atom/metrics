@@ -1,10 +1,8 @@
 Guid = require 'guid'
 
 module.exports =
-  configDefaults:
-    userId: Guid.raw()
-
   activate: ({sessionLength}) ->
+    atom.config.set('metrics.userId', Guid.raw()) unless atom.config.get('metrics.userId')
     @sessionStart = Date.now()
     process.nextTick ->
       Reporter = require './reporter'
