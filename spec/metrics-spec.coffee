@@ -1,54 +1,38 @@
+{WorkspaceView} = require 'atom'
 Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
-  describe "when metrics are enabled", ->
-    beforeEach ->
-      atom.config.set('metrics.sendData', true)
+  beforeEach ->
+    atom.workspaceView = new WorkspaceView
 
-    it "reports activation events", ->
-      spyOn(Reporter, 'request')
-      atom.packages.activatePackage('metrics')
+  it "reports start event", ->
+    spyOn(Reporter, 'request')
+    atom.packages.activatePackage('metrics')
 
-      waitsFor ->
-        Reporter.request.callCount is 1
+    waitsFor ->
+      Reporter.request.callCount is 2
 
-      runs ->
-        requestArgs = Reporter.request.calls[0].args[0]
-        expect(requestArgs.method).toBe 'POST'
-        expect(requestArgs.qs).toBeDefined()
+    runs ->
+      requestArgs = Reporter.request.calls[0].args[0]
+      expect(requestArgs.method).toBe 'POST'
+      expect(requestArgs.qs).toBeDefined()
 
-    it "reports deactivation events", ->
-      spyOn(Reporter, 'request')
-      atom.packages.activatePackage('metrics')
+  it "reports end event", ->
+    spyOn(Reporter, 'request')
+    atom.packages.activatePackage('metrics')
 
-      waitsFor ->
-        Reporter.request.callCount is 1
+    waitsFor ->
+      Reporter.request.callCount is 2
 
-      runs ->
-        Reporter.request.reset()
-        atom.packages.deactivatePackage('metrics')
-        atom.packages.activatePackage('metrics')
-
-      waitsFor ->
-        Reporter.request.callCount is 2
-
-      runs ->
-        [requestArgs] = Reporter.request.calls[0].args
-        expect(requestArgs.method).toBe 'POST'
-        expect(requestArgs.qs).toBeDefined()
-
-  describe "when metrics are disabled", ->
-    beforeEach ->
-      atom.config.set('metrics.sendData', false)
-
-    it "reports activation events", ->
-      spyOn(Reporter, 'request')
-      atom.packages.activatePackage('metrics')
-      expect(Reporter.request).not.toHaveBeenCalled()
-
-    it "reports deactivation events", ->
-      atom.packages.activatePackage('metrics')
-      spyOn(Reporter, 'request')
+    runs ->
+      Reporter.request.reset()
       atom.packages.deactivatePackage('metrics')
       atom.packages.activatePackage('metrics')
-      expect(Reporter.request.callCount).toBe 0
+
+    waitsFor ->
+      Reporter.request.callCount is 3
+
+    runs ->
+      [requestArgs] = Reporter.request.calls[0].args
+      expect(requestArgs.method).toBe 'POST'
+      expect(requestArgs.qs).toBeDefined()
