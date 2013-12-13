@@ -8,7 +8,8 @@ module.exports =
       Reporter = require './reporter'
       Reporter.sendEndedEvent(sessionLength) if sessionLength
       Reporter.sendStartedEvent()
-      Reporter.sendLoadTimeEvent()
+      Reporter.sendWindowLoadTimeEvent()
+      Reporter.sendShellLoadTimeEvent()
       atom.workspaceView.on 'editor:attached', (event, editorView) ->
         Reporter.sendEditorAppView()
 

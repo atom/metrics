@@ -29,7 +29,7 @@ module.exports =
 
       @send(params)
 
-    @sendLoadTimeEvent: ->
+    @sendWindowLoadTimeEvent: ->
       params =
         t: 'timing'
         utc: 'app'
@@ -37,6 +37,17 @@ module.exports =
         utt: atom.getWindowLoadTime()
 
       @send(params)
+
+    @sendShellLoadTimeEvent: ->
+      shellLoadTime = atom.getLoadSettings().shellLoadTime
+      if shellLoadTime?
+        params =
+          t: 'timing'
+          utc: 'shell'
+          utv: 'load'
+          utt: shellLoadTime
+
+        @send(params)
 
     @sendEditorAppView: ->
       params =
