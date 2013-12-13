@@ -17,7 +17,7 @@ module.exports =
         t: 'event'
         ec: 'session'
         ea: 'started'
-          
+
       @send(params)
 
     @sendEndedEvent: (sessionLength) ->
@@ -28,14 +28,14 @@ module.exports =
         ev: sessionLength
 
       @send(params)
-      
+
     @sendLoadTimeEvent: ->
       params =
         t: 'timing'
         utc: 'app'
         utv: 'load'
         utt: atom.getWindowLoadTime()
-          
+
       @send(params)
 
     @sendEditorAppView: ->
