@@ -1,4 +1,3 @@
-os = require 'os'
 request = require 'request'
 {_} = require 'atom'
 
