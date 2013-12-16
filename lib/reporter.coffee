@@ -3,19 +3,19 @@ request = require 'request'
 
 module.exports =
   class Reporter
-    @sendEvent: (name, value) ->
+    @sendEvent: (category, name, value) ->
       params =
         t: 'event'
-        ec: 'session'
+        ec: category
         ea: name
         ev: value
 
       @send(params)
 
-    @sendTiming: (name, value) ->
+    @sendTiming: (category, name, value) ->
       params =
         t: 'timing'
-        utc: 'app'
+        utc: category
         utv: name
         utt: value
 
