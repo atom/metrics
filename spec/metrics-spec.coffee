@@ -10,8 +10,7 @@ describe "Metrics", ->
     atom.packages.activatePackage('metrics')
 
     waitsFor ->
-      console.log Reporter.request.callCount
-      Reporter.request.callCount is 3
+      Reporter.request.callCount is 2
 
     runs ->
       Reporter.request.reset()
@@ -19,8 +18,7 @@ describe "Metrics", ->
       atom.packages.activatePackage('metrics')
 
     waitsFor ->
-      console.log Reporter.request.callCount
-      Reporter.request.callCount is 4
+      Reporter.request.callCount is 3
 
     runs ->
       [requestArgs] = Reporter.request.calls[0].args
