@@ -61,6 +61,8 @@ module.exports =
       @request
         method: 'POST'
         url: "https://www.google-analytics.com/collect"
+        headers:
+          'User-Agent': navigator.userAgent
         qs: params
 
     # Private
