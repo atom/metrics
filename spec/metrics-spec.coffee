@@ -10,6 +10,7 @@ describe "Metrics", ->
     atom.packages.activatePackage('metrics')
 
     waitsFor ->
+      console.log Reporter.request.callCount
       Reporter.request.callCount is 3
 
     runs ->
@@ -18,6 +19,7 @@ describe "Metrics", ->
       atom.packages.activatePackage('metrics')
 
     waitsFor ->
+      console.log Reporter.request.callCount
       Reporter.request.callCount is 4
 
     runs ->

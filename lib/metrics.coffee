@@ -10,7 +10,7 @@ module.exports =
     Reporter.sendEvent('started')
     Reporter.sendTiming('core-load', atom.getWindowLoadTime())
     Reporter.sendTiming('shell-load', atom.getLoadSettings().shellLoadTime)
-     atom.workspaceView.on 'pane:item-added', (event, item) ->
+    atom.workspaceView.on 'pane:item-added', (event, item) ->
         name = item.getViewClass?().name ? item.constructor.name
         Reporter.sendView(name)
 
