@@ -6,12 +6,12 @@ module.exports =
     @sessionStart = Date.now()
     process.nextTick ->
       Reporter = require './reporter'
-      Reporter.sendEndedEvent(sessionLength) if sessionLength
-      Reporter.sendStartedEvent()
-      Reporter.sendWindowLoadTimeEvent()
-      Reporter.sendShellLoadTimeEvent()
+      Reporter.sendEvent('ended', sessionLength) if sessionLength
+      Reporter.sendEvent('started')
+      Reporter.sendTiming('core-load', atom.getWindowLoadTime())
+      Reporter.sendTiming('shell-load', atom.getLoadSettings().shellLoadTime)
       atom.workspaceView.on 'editor:attached', (event, editorView) ->
-        Reporter.sendEditorAppView()
+        Reporter.sendView('EditorView')
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
