@@ -1,17 +1,24 @@
 Guid = require 'guid'
+Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
     atom.config.set('metrics.userId', Guid.raw()) unless atom.config.get('metrics.userId')
     @sessionStart = Date.now()
+
+    Reporter.sendEvent('window', 'ended', sessionLength) if sessionLength
+    Reporter.sendEvent('window', 'started')
+    atom.workspaceView.on 'pane:item-added', (event, item) ->
+      name = item.getViewClass?().name ? item.constructor.name
+      Reporter.sendView(name)
+
+    if atom.getLoadSettings().shellLoadTime?
+      # Only send shell load time for the first window
+      Reporter.sendTiming('shell', 'load', atom.getLoadSettings().shellLoadTime)
+
     process.nextTick ->
-      Reporter = require './reporter'
-      Reporter.sendEndedEvent(sessionLength) if sessionLength
-      Reporter.sendStartedEvent()
-      Reporter.sendWindowLoadTimeEvent()
-      Reporter.sendShellLoadTimeEvent()
-      atom.workspaceView.on 'editor:attached', (event, editorView) ->
-        Reporter.sendEditorAppView()
+      # Wait until window is fully bootstrapped before sending the load time
+      Reporter.sendTiming('core', 'load', atom.getWindowLoadTime())
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart

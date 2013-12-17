@@ -5,19 +5,7 @@ describe "Metrics", ->
   beforeEach ->
     atom.workspaceView = new WorkspaceView
 
-  it "reports start event", ->
-    spyOn(Reporter, 'request')
-    atom.packages.activatePackage('metrics')
-
-    waitsFor ->
-      Reporter.request.callCount is 2
-
-    runs ->
-      requestArgs = Reporter.request.calls[0].args[0]
-      expect(requestArgs.method).toBe 'POST'
-      expect(requestArgs.qs).toBeDefined()
-
-  it "reports end event", ->
+  it "reports event", ->
     spyOn(Reporter, 'request')
     atom.packages.activatePackage('metrics')
 
