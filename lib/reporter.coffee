@@ -51,4 +51,4 @@ module.exports =
       cid: atom.config.get('metrics.userId')
       an: 'atom'
       av: atom.getVersion()
-      sr: screen.width + "x" + screen.height
+      sr: "#{screen.width}x#{screen.height}"
