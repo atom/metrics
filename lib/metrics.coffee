@@ -1,9 +1,10 @@
-Guid = require 'guid'
 Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
-    atom.config.set('metrics.userId', Guid.raw()) unless atom.config.get('metrics.userId')
+    unless atom.config.get('metrics.userId')
+      atom.config.set('metrics.userId', require('guid').raw())
+
     @sessionStart = Date.now()
 
     Reporter.sendEvent('window', 'ended', sessionLength) if sessionLength
