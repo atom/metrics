@@ -8,6 +8,7 @@
     "atom": ">25.0"
   },
   "dependencies": {
-    "guid": "0.0.11"
+    "guid": "0.0.11",
+    "getmac": "~1.0.0"
   }
 }
