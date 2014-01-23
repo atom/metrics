@@ -1,10 +1,18 @@
+crypto = require 'crypto'
 Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
     unless atom.config.get('metrics.userId')
-      atom.config.set('metrics.userId', require('guid').raw())
+      @getUserId (userId) -> atom.config.set('metrics.userId', userId)
+      @begin(sessionLength)
+    else
+      @begin(sessionLength)
 
+  serialize: ->
+    sessionLength: Date.now() - @sessionStart
+
+  begin: (sessionLength) ->
     @sessionStart = Date.now()
 
     Reporter.sendEvent('window', 'ended', sessionLength) if sessionLength
@@ -21,5 +29,10 @@ module.exports =
       # Wait until window is fully bootstrapped before sending the load time
       Reporter.sendTiming('core', 'load', atom.getWindowLoadTime())
 
-  serialize: ->
-    sessionLength: Date.now() - @sessionStart
+
+  getUserId: (callback) ->
+    require('getmac').getMac (error, macAddress) =>
+      if error?
+        callback require('guid').raw()
+      else
+        callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
