@@ -1,7 +1,7 @@
 {
   "name": "metrics",
   "main": "./lib/metrics",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "Reports basic usage metrics",
   "repository": "https://github.com/atom/metrics",
   "engines": {
