@@ -7,7 +7,9 @@ describe "Metrics", ->
 
   it "reports event", ->
     spyOn(Reporter, 'request')
-    atom.packages.activatePackage('metrics')
+
+    waitsForPromise ->
+      atom.packages.activatePackage('metrics')
 
     waitsFor ->
       Reporter.request.callCount is 2
@@ -15,6 +17,8 @@ describe "Metrics", ->
     runs ->
       Reporter.request.reset()
       atom.packages.deactivatePackage('metrics')
+
+    waitsForPromise ->
       atom.packages.activatePackage('metrics')
 
     waitsFor ->
