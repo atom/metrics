@@ -3,10 +3,10 @@ Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
-    unless atom.config.get('metrics.userId')
-      @getUserId (userId) -> atom.config.set('metrics.userId', userId)
+    if atom.config.get('metrics.userId')
       @begin(sessionLength)
     else
+      @getUserId (userId) -> atom.config.set('metrics.userId', userId)
       @begin(sessionLength)
 
   serialize: ->

@@ -47,7 +47,6 @@ module.exports =
         cd: name
       @send(params)
 
-    # Private
     @send: (params) ->
       _.extend(params, @defaultParams())
       @request
