@@ -3,10 +3,10 @@ Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
-    unless atom.config.get('metrics.userId')
-      @getUserId (userId) -> atom.config.set('metrics.userId', userId)
+    if atom.config.get('metrics.userId')
       @begin(sessionLength)
     else
+      @getUserId (userId) -> atom.config.set('metrics.userId', userId)
       @begin(sessionLength)
 
   serialize: ->
@@ -18,8 +18,7 @@ module.exports =
     Reporter.sendEvent('window', 'ended', sessionLength) if sessionLength
     Reporter.sendEvent('window', 'started')
     atom.workspaceView.on 'pane:item-added', (event, item) ->
-      name = item.getViewClass?().name ? item.constructor.name
-      Reporter.sendView(name)
+      Reporter.sendPaneItem(item)
 
     if atom.getLoadSettings().shellLoadTime?
       # Only send shell load time for the first window
