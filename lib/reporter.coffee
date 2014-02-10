@@ -29,20 +29,20 @@ module.exports =
       return name unless name is 'EditorView'
 
       itemPath = item.getPath?()
-      if itemPath and path.dirname(itemPath) is atom.getConfigDirPath()
-        extension = path.extname(itemPath)
-        switch path.basename(itemPath, extension)
-          when 'config'
-            name = 'UserConfig'     if extension in ['.json', '.cson']
-          when 'init'
-            name = 'UserInitScript' if extension in ['.js', '.coffee']
-          when 'keymap'
-            name = 'UserKeymap'     if extension in ['.json', '.cson']
-          when 'snippets'
-            name = 'UserSnippets'   if extension in ['.json', '.cson']
-          when 'styles'
-            name = 'UserStylesheet' if extension in ['.css', '.less']
+      return name unless path.dirname(itemPath) is atom.getConfigDirPath()
 
+      extension = path.extname(itemPath)
+      switch path.basename(itemPath, extension)
+        when 'config'
+          name = 'UserConfig'     if extension in ['.json', '.cson']
+        when 'init'
+          name = 'UserInitScript' if extension in ['.js', '.coffee']
+        when 'keymap'
+          name = 'UserKeymap'     if extension in ['.json', '.cson']
+        when 'snippets'
+          name = 'UserSnippets'   if extension in ['.json', '.cson']
+        when 'styles'
+          name = 'UserStylesheet' if extension in ['.css', '.less']
       name
 
     @sendPaneItem: (item) ->
