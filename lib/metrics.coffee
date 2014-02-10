@@ -18,7 +18,7 @@ module.exports =
     Reporter.sendEvent('window', 'ended', sessionLength) if sessionLength
     Reporter.sendEvent('window', 'started')
     atom.workspaceView.on 'pane:item-added', (event, item) ->
-      Reporter.sendView(item)
+      Reporter.sendPaneItem(item)
 
     if atom.getLoadSettings().shellLoadTime?
       # Only send shell load time for the first window
