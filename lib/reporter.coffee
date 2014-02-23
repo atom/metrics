@@ -2,7 +2,7 @@ https = require 'https'
 path = require 'path'
 querystring = require 'querystring'
 
-{_} = require 'atom'
+_ = require 'underscore-plus'
 
 module.exports =
   class Reporter

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "guid": "0.0.11",
-    "getmac": "~1.0.0"
+    "getmac": "~1.0.0",
+    "underscore-plus": "1.x"
   }
 }
