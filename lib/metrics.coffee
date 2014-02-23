@@ -28,7 +28,6 @@ module.exports =
       # Wait until window is fully bootstrapped before sending the load time
       Reporter.sendTiming('core', 'load', atom.getWindowLoadTime())
 
-
   getUserId: (callback) ->
     require('getmac').getMac (error, macAddress) =>
       if error?
