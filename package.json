@@ -2,7 +2,7 @@
   "name": "metrics",
   "main": "./lib/metrics",
   "version": "0.27.0",
-  "description": "Reports basic usage metrics",
+  "description": "Reports basic usage metrics to Google Analytics",
   "repository": "https://github.com/atom/metrics",
   "license": "MIT",
   "engines": {
