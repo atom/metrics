@@ -4,6 +4,7 @@
   "version": "0.26.0",
   "description": "Reports basic usage metrics",
   "repository": "https://github.com/atom/metrics",
+  "license": "MIT",
   "engines": {
     "atom": ">25.0"
   },
