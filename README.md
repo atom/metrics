@@ -14,7 +14,7 @@ _Metrics_ section of the Settings view (`cmd-,`).
 * The name of each item opened in a pane such as `EditorView`, `SettingsView`,
   and `MarkdownPreviewView`
 * The amount of time the current window was open for
-* The amount of time the current window to took to load
+* The amount of time the current window took to load
 * The amount of time the app took to launch
 
 [GA]: http://www.google.com/analytics
