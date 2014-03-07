@@ -3,7 +3,7 @@ Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
-    @getUserId (userId) ->
+    @getUserId (userId) =>
       Reporter.setUserId(userId)
       @begin(sessionLength)
 
