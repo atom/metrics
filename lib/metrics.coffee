@@ -31,6 +31,6 @@ module.exports =
   getUserId: (callback) ->
     require('getmac').getMac (error, macAddress) =>
       if error?
-        callback require('guid').raw()
+        throw new Error("Failed to resolve MAC address.")
       else
         callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
