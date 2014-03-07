@@ -3,6 +3,7 @@ Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
+    atom.config.set('metrics', undefined)
     @getUserId (userId) =>
       Reporter.setUserId(userId)
       @begin(sessionLength)
