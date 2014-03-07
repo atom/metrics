@@ -4,9 +4,12 @@ Reporter = require './reporter'
 module.exports =
   activate: ({sessionLength}) ->
     atom.config.set('metrics', undefined)
-    @getUserId (userId) =>
-      Reporter.setUserId(userId)
-      @begin(sessionLength)
+    @getUserId (error, userId) =>
+      if error?
+        Reporter.sendEvent('metrics', 'failed')
+      else
+        Reporter.setUserId(userId)
+        @begin(sessionLength)
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
@@ -30,6 +33,6 @@ module.exports =
   getUserId: (callback) ->
     require('getmac').getMac (error, macAddress) =>
       if error?
-        throw new Error("Failed to resolve MAC address.")
+        callback new Error("Failed to resolve MAC address.")
       else
-        callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
+        callback null, crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
