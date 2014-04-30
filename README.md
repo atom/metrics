@@ -1,4 +1,4 @@
-## Metrics package
+## Metrics package [![Build Status](https://travis-ci.org/atom/metrics.svg?branch=master)](https://travis-ci.org/atom/metrics)
 
 A package that reports usage information to [Google Analytics][GA].
 
