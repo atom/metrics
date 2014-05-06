@@ -9,7 +9,7 @@
     "atom": ">0.50.0"
   },
   "dependencies": {
-    "guid": "0.0.11",
+    "node-uuid": "~1.4.1",
     "getmac": "~1.0.0",
     "underscore-plus": "1.x"
   }
