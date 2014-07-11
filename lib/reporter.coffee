@@ -26,9 +26,9 @@ module.exports =
 
     @viewNameForPaneItem: (item) ->
       name = item.getViewClass?().name ? item.constructor.name
-      return name unless name is 'EditorView'
+      return name unless item.getPath
 
-      itemPath = item.getPath?()
+      itemPath = item.getPath()
       return name unless path.dirname(itemPath) is atom.getConfigDirPath()
 
       extension = path.extname(itemPath)
