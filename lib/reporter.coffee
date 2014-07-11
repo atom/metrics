@@ -26,9 +26,8 @@ module.exports =
 
     @viewNameForPaneItem: (item) ->
       name = item.getViewClass?().name ? item.constructor.name
-      return name unless name is 'EditorView'
-
       itemPath = item.getPath?()
+
       return name unless path.dirname(itemPath) is atom.getConfigDirPath()
 
       extension = path.extname(itemPath)
@@ -49,6 +48,7 @@ module.exports =
       params =
         t: 'appview'
         cd: @viewNameForPaneItem(item)
+        dt: item.getGrammar?().name
       @send(params)
 
     @send: (params) ->
