@@ -1,4 +1,4 @@
-https = require 'https'
+{$} = require 'atom'
 path = require 'path'
 querystring = require 'querystring'
 
@@ -54,16 +54,11 @@ module.exports =
     @send: (params) ->
       _.extend(params, @defaultParams())
       @request
-        method: 'POST'
-        hostname: 'www.google-analytics.com'
-        path: "/collect?#{querystring.stringify(params)}"
-        headers:
-          'User-Agent': navigator.userAgent
+        type: 'POST'
+        url: "https://www.google-analytics.com/collect?#{querystring.stringify(params)}"
 
     @request: (options) ->
-      request = https.request(options)
-      request.on 'error', -> # This prevents errors from going to the console
-      request.end()
+      $.ajax(options) if navigator.onLine
 
     @defaultParams: ->
       v: 1
