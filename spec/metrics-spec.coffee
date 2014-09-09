@@ -26,7 +26,5 @@ describe "Metrics", ->
 
     runs ->
       [requestArgs] = Reporter.request.calls[0].args
-      expect(requestArgs.method).toBe 'POST'
-      expect(requestArgs.hostname).toBe 'www.google-analytics.com'
-      expect(requestArgs.headers).toBeDefined()
-      expect(requestArgs.path).toBeDefined()
+      expect(requestArgs.type).toBe 'POST'
+      expect(requestArgs.url).toBeDefined()
