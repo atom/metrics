@@ -35,11 +35,16 @@ describe "Metrics", ->
       waitsForPromise ->
         atom.packages.activatePackage('metrics')
 
+      waitsForPromise ->
+        atom.workspace.open('file1.txt')
+
       runs ->
+        expect(Reporter.sendPaneItem.callCount).toBe 1
+        Reporter.sendPaneItem.reset()
         atom.packages.deactivatePackage('metrics')
 
       waitsForPromise ->
-        atom.workspace.open()
+        atom.workspace.open('file2.txt')
 
       runs ->
         expect(Reporter.sendPaneItem.callCount).toBe 0
