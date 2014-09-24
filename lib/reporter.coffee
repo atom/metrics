@@ -48,7 +48,7 @@ module.exports =
       params =
         t: 'appview'
         cd: @viewNameForPaneItem(item)
-        dt: item.getGrammar?().name
+        dt: item.getGrammar?()?.name
       @send(params)
 
     @send: (params) ->
