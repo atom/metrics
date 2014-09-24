@@ -9,6 +9,9 @@ module.exports =
       @getUserId (userId) -> atom.config.set('metrics.userId', userId)
       @begin(sessionLength)
 
+  deactivate: ->
+    @paneItemSubscription?.dispose()
+
   serialize: ->
     sessionLength: Date.now() - @sessionStart
 
@@ -17,7 +20,7 @@ module.exports =
 
     Reporter.sendEvent('window', 'ended', sessionLength) if sessionLength
     Reporter.sendEvent('window', 'started')
-    atom.workspace.onDidAddPaneItem ({item}) ->
+    @paneItemSubscription = atom.workspace.onDidAddPaneItem ({item}) ->
       Reporter.sendPaneItem(item)
 
     if atom.getLoadSettings().shellLoadTime?

@@ -4,10 +4,9 @@ Reporter = require '../lib/reporter'
 describe "Metrics", ->
   beforeEach ->
     atom.workspaceView = new WorkspaceView
-
-  it "reports event", ->
     spyOn(Reporter, 'request')
 
+  it "reports event", ->
     waitsForPromise ->
       atom.packages.activatePackage('metrics')
 
@@ -28,3 +27,19 @@ describe "Metrics", ->
       [requestArgs] = Reporter.request.calls[0].args
       expect(requestArgs.type).toBe 'POST'
       expect(requestArgs.url).toBeDefined()
+
+  describe "when deactivated", ->
+    it "stops reporting pane items", ->
+      spyOn(Reporter, 'sendPaneItem')
+
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics')
+
+      runs ->
+        atom.packages.deactivatePackage('metrics')
+
+      waitsForPromise ->
+        atom.workspace.open()
+
+      runs ->
+        expect(Reporter.sendPaneItem.callCount).toBe 0
