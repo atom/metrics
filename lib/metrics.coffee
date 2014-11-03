@@ -3,10 +3,7 @@ Reporter = require './reporter'
 
 module.exports =
   activate: ({sessionLength}) ->
-    if atom.config.get('metrics.userId')
-      @begin(sessionLength)
-    else
-      @getUserId (userId) -> atom.config.set('metrics.userId', userId)
+    @ensureUserInfo =>
       @begin(sessionLength)
 
   deactivate: ->
@@ -31,9 +28,32 @@ module.exports =
       # Wait until window is fully bootstrapped before sending the load time
       Reporter.sendTiming('core', 'load', atom.getWindowLoadTime())
 
-  getUserId: (callback) ->
+  ensureUserInfo: (callback) ->
+    if localStorage.getItem('metrics.userId')
+      callback()
+    else if atom.config.get('metrics.userId')
+      # legacy. Users who had the metrics id in their config file
+      localStorage.setItem('metrics.userId', atom.config.get('metrics.userId'))
+      callback()
+    else
+      @createUserId (userId) =>
+        localStorage.setItem('metrics.userId', userId)
+        localStorage.setItem('metrics.sd', @createStartDate())
+        callback()
+
+  createUserId: (callback) ->
     require('getmac').getMac (error, macAddress) =>
       if error?
         callback require('node-uuid').v4()
       else
         callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
+
+  createStartDate: ->
+    startDate = new Date
+    year = startDate.getFullYear()
+    month = startDate.getMonth() + 1
+    date = startDate.getDate()
+    "#{year}#{@zerofill(month, 2)}#{@zerofill(date, 2)}"
+
+  zerofill: (value, zeros) ->
+    (new Array(zeros + 1).join('0') + value).slice(-zeros)
