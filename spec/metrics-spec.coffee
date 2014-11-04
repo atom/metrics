@@ -15,7 +15,7 @@ describe "Metrics", ->
   afterEach ->
     atom.packages.deactivatePackage('metrics')
 
-  it "reports event", ->
+  it "reports events", ->
     waitsForPromise ->
       atom.packages.activatePackage('metrics')
 
@@ -36,6 +36,33 @@ describe "Metrics", ->
       [requestArgs] = Reporter.request.calls[0].args
       expect(requestArgs.type).toBe 'POST'
       expect(requestArgs.url).toBeDefined()
+
+  describe "reporting exceptions", ->
+    beforeEach ->
+      spyOn(atom, 'openDevTools')
+      spyOn(atom, 'executeJavaScriptInDevTools')
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics')
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+    it "reports an exception with the correct type", ->
+      message = "Uncaught TypeError: Cannot call method 'getScreenRow' of undefined"
+      window.onerror(message)
+
+      [requestArgs] = Reporter.request.mostRecentCall.args
+      expect(requestArgs.url).toContain "t=exception"
+      expect(requestArgs.url).toContain "exd=TypeError"
+
+    describe "when the message has no clear type", ->
+      it "reports an exception with the correct type", ->
+        message = ""
+        window.onerror(message)
+
+        [requestArgs] = Reporter.request.mostRecentCall.args
+        expect(requestArgs.url).toContain "t=exception"
+        expect(requestArgs.url).toContain "exd=Unknown"
 
   describe "start date", ->
     createStartDate = ->
