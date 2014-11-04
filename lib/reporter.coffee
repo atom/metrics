@@ -59,6 +59,19 @@ module.exports =
         dt: item.getGrammar?()?.name
       @send(params)
 
+    @sendCommand: (commandEvent) ->
+      return unless commandEvent.keyBindingAborted?
+
+      eventName = commandEvent.type
+      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
+      # return if IGNORED_COMMANDS[commandEvent.type]?
+
+      window.commandCount = @commandCount ?= {}
+      @commandCount[eventName] ?= 0
+      @commandCount[eventName]++
+
+      console.log eventName
+
     @send: (params) ->
       _.extend(params, @defaultParams())
       @request

@@ -9,6 +9,7 @@ module.exports =
   deactivate: ->
     @errorSubscription?.dispose()
     @paneItemSubscription?.dispose()
+    @commandSubscription?.dispose()
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
@@ -25,6 +26,9 @@ module.exports =
       errorType = errorMessage.split(':')[0] or 'Unknown'
       errorType = errorType.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorType)
+
+    @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
+      Reporter.sendCommand(commandEvent)
 
     if atom.getLoadSettings().shellLoadTime?
       # Only send shell load time for the first window
