@@ -7,6 +7,7 @@ module.exports =
       @begin(sessionLength)
 
   deactivate: ->
+    @errorSubscription?.dispose()
     @paneItemSubscription?.dispose()
 
   serialize: ->
