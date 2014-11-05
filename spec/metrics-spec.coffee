@@ -2,6 +2,7 @@
 Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
+  metrics = null
   beforeEach ->
     atom.workspaceView = new WorkspaceView
     spyOn(Reporter, 'request')
@@ -38,17 +39,30 @@ describe "Metrics", ->
       expect(requestArgs.url).toBeDefined()
 
   describe "start date", ->
-    createStartDate = ->
-      startDate = new Date
-      year = startDate.getFullYear()
-      month = startDate.getMonth() + 1
-      date = startDate.getDate()
-      zerofill = (value, zeros) ->
-        (new Array(zeros + 1).join('0') + value).slice(-zeros)
-      "#{year}#{zerofill(month, 2)}#{zerofill(date, 2)}"
+    describe "metrics.getWeekNumber()", ->
+      beforeEach ->
+        waitsForPromise ->
+          atom.packages.activatePackage('metrics')
+        runs ->
+          metrics = atom.packages.getActivePackage('metrics').mainModule
+
+      it "generates week of the year number beginning in 2014", ->
+        expect(metrics.getWeekNumber(new Date(2014, 0, 1))).toBe 1
+        expect(metrics.getWeekNumber(new Date(2014, 3, 25))).toBe 17
+        expect(metrics.getWeekNumber(new Date(2014, 11, 27))).toBe 52
+        expect(metrics.getWeekNumber(new Date(2014, 11, 28))).toBe 101
+        expect(metrics.getWeekNumber(new Date(2014, 11, 31))).toBe 101
+
+        expect(metrics.getWeekNumber(new Date(2015, 0, 1))).toBe 101
+        expect(metrics.getWeekNumber(new Date(2015, 0, 4))).toBe 102
+        expect(metrics.getWeekNumber(new Date(2015, 11, 31))).toBe 201
+
+        expect(metrics.getWeekNumber(new Date(2016, 0, 1))).toBe 201
 
     describe "when the user has no metrics data in any storage", ->
       it "generates a new start date", ->
+        spyOn(metrics, 'getTodaysDate').andReturn(new Date(2014, 3, 25))
+
         waitsForPromise ->
           atom.packages.activatePackage('metrics')
 
@@ -56,13 +70,14 @@ describe "Metrics", ->
           Reporter.request.callCount > 0
 
         runs ->
+          metrics = atom.packages.getActivePackage('metrics').mainModule
           [requestArgs] = Reporter.request.calls[0].args
-          expect(requestArgs.url).toContain "cd1=#{createStartDate()}"
+          expect(requestArgs.url).toContain "cd1=20140425%2C017"
 
     describe "when start date is already in local storage", ->
       it "uses the start date from localStorage", ->
         localStorage.setItem('metrics.userId', 'omgthatguy')
-        localStorage.setItem('metrics.sd', '20120201')
+        localStorage.setItem('metrics.sd', '20120201,5')
 
         waitsForPromise ->
           atom.packages.activatePackage('metrics')
