@@ -59,18 +59,19 @@ module.exports =
         dt: item.getGrammar?()?.name
       @send(params)
 
-    @sendCommand: (commandEvent) ->
-      return unless commandEvent.keyBindingAborted?
+    @sendCommand: (commandName) ->
+      @commandCount ?= {}
+      @commandCount[commandName] ?= 0
+      @commandCount[commandName]++
 
-      eventName = commandEvent.type
-      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
-      # return if IGNORED_COMMANDS[commandEvent.type]?
+      params =
+        t: 'event'
+        ec: 'command'
+        ea: commandName.split(':')[0]
+        el: commandName
+        ev: @commandCount[commandName]
 
-      window.commandCount = @commandCount ?= {}
-      @commandCount[eventName] ?= 0
-      @commandCount[eventName]++
-
-      console.log eventName
+      @send(params)
 
     @send: (params) ->
       _.extend(params, @defaultParams())

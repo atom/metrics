@@ -2,10 +2,12 @@
 Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
-  metrics = null
+  [metrics, workspaceElement] = []
   beforeEach ->
     atom.workspaceView = new WorkspaceView
     spyOn(Reporter, 'request')
+
+    workspaceElement = atom.views.getView(atom.workspace)
 
     storage = {}
     spyOn(localStorage, 'setItem').andCallFake (key, value) ->
@@ -142,12 +144,45 @@ describe "Metrics", ->
           expect(localStorage.getItem('metrics.userId')).toBe 'omgthatguy'
           expect(localStorage.getItem('metrics.sd')).toBeUndefined()
 
-  it "reports event", ->
-    waitsForPromise ->
-      atom.packages.activatePackage('metrics')
+  describe "sending commands", ->
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics')
 
-    waitsFor ->
-      Reporter.request.callCount is 2
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+    it "reports commands dispatched via atom.commands", ->
+      command = 'some-package:a-command'
+      expect(Reporter.commandCount).toBeUndefined()
+
+      atom.commands.dispatch(workspaceElement, command, null)
+      expect(Reporter.commandCount[command]).toBe 1
+
+      [requestArgs] = Reporter.request.mostRecentCall.args
+      expect(requestArgs.url).toContain "ec=command"
+      expect(requestArgs.url).toContain "ea=some-package"
+      expect(requestArgs.url).toContain "el=some-package%3Aa-command"
+      expect(requestArgs.url).toContain "ev=1"
+
+      atom.commands.dispatch(workspaceElement, command, null)
+      expect(Reporter.commandCount[command]).toBe 2
+
+      [requestArgs] = Reporter.request.mostRecentCall.args
+      expect(requestArgs.url).toContain "ev=2"
+
+    it "does not report editor: and core: commands", ->
+      Reporter.request.reset()
+      atom.commands.dispatch(workspaceElement, 'core:move-up', null)
+      expect(Reporter.request).not.toHaveBeenCalled()
+
+      atom.commands.dispatch(workspaceElement, 'editor:move-to-end-of-line', null)
+      expect(Reporter.request).not.toHaveBeenCalled()
+
+    it "does not report commands triggered via jquery", ->
+      Reporter.request.reset()
+      atom.workspaceView.trigger('some-package:a-command')
+      expect(Reporter.request).not.toHaveBeenCalled()
 
   describe "when deactivated", ->
     it "stops reporting pane items", ->

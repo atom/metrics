@@ -28,7 +28,10 @@ module.exports =
       Reporter.sendException(errorType)
 
     @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
-      Reporter.sendCommand(commandEvent)
+      {type: eventName} = commandEvent
+      return if commandEvent.detail?.jQueryTrigger
+      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
+      Reporter.sendCommand(eventName)
 
     if atom.getLoadSettings().shellLoadTime?
       # Only send shell load time for the first window
