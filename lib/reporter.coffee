@@ -24,6 +24,14 @@ module.exports =
 
       @send(params)
 
+    @sendException: (description) ->
+      params =
+        t: 'exception'
+        exd: description
+        exf: if atom.inDevMode() then '0' else '1'
+
+      @send(params)
+
     @viewNameForPaneItem: (item) ->
       name = item.getViewClass?().name ? item.constructor.name
       itemPath = item.getPath?()
