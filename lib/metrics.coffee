@@ -9,6 +9,7 @@ module.exports =
   deactivate: ->
     @errorSubscription?.dispose()
     @paneItemSubscription?.dispose()
+    @commandSubscription?.dispose()
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
@@ -25,6 +26,12 @@ module.exports =
       errorType = errorMessage.split(':')[0] or 'Unknown'
       errorType = errorType.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorType)
+
+    @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
+      {type: eventName} = commandEvent
+      return if commandEvent.detail?.jQueryTrigger
+      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
+      Reporter.sendCommand(eventName)
 
     if atom.getLoadSettings().shellLoadTime?
       # Only send shell load time for the first window

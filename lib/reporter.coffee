@@ -59,6 +59,20 @@ module.exports =
         dt: item.getGrammar?()?.name
       @send(params)
 
+    @sendCommand: (commandName) ->
+      @commandCount ?= {}
+      @commandCount[commandName] ?= 0
+      @commandCount[commandName]++
+
+      params =
+        t: 'event'
+        ec: 'command'
+        ea: commandName.split(':')[0]
+        el: commandName
+        ev: @commandCount[commandName]
+
+      @send(params)
+
     @send: (params) ->
       _.extend(params, @defaultParams())
       @request
