@@ -48,12 +48,22 @@ module.exports =
       else
         callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
 
-  createStartDate: ->
-    startDate = new Date
+  getTodaysDate: -> new Date
+
+  createStartDate: (startDate) ->
+    startDate ?= @getTodaysDate()
     year = startDate.getFullYear()
     month = startDate.getMonth() + 1
     date = startDate.getDate()
-    "#{year}#{@zerofill(month, 2)}#{@zerofill(date, 2)}"
+    weekNumber = @getWeekNumber(startDate)
+    "#{year}#{@zerofill(month, 2)}#{@zerofill(date, 2)},#{@zerofill(weekNumber, 3)}"
+
+  getWeekNumber: (date) ->
+    date ?= @getTodaysDate()
+    oneJan = new Date(date.getFullYear(), 0, 1)
+    weekNumber = Math.ceil((((date - oneJan) / 86400000) + oneJan.getDay() + 1) / 7)
+    weekNumber = 101 if weekNumber is 53
+    weekNumber + 100 * (date.getFullYear() - 2014)
 
   zerofill: (value, zeros) ->
     (new Array(zeros + 1).join('0') + value).slice(-zeros)
