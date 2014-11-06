@@ -76,6 +76,19 @@ describe "Metrics", ->
       atom.commands.dispatch(workspaceElement, 'editor:move-to-end-of-line', null)
       expect(Reporter.request).not.toHaveBeenCalled()
 
+    it "does not report non-namespaced commands", ->
+      Reporter.request.reset()
+      atom.commands.dispatch(workspaceElement, 'dragover', null)
+      expect(Reporter.request).not.toHaveBeenCalled()
+
+    it "does not report vim-mode:* movement commands", ->
+      Reporter.request.reset()
+      atom.commands.dispatch(workspaceElement, 'vim-mode:move-up', null)
+      atom.commands.dispatch(workspaceElement, 'vim-mode:move-down', null)
+      atom.commands.dispatch(workspaceElement, 'vim-mode:move-left', null)
+      atom.commands.dispatch(workspaceElement, 'vim-mode:move-right', null)
+      expect(Reporter.request).not.toHaveBeenCalled()
+
     it "does not report commands triggered via jquery", ->
       Reporter.request.reset()
       atom.workspaceView.trigger('some-package:a-command')

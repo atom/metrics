@@ -1,6 +1,12 @@
 crypto = require 'crypto'
 Reporter = require './reporter'
 
+IgnoredCommands =
+  'vim-mode:move-up': true
+  'vim-mode:move-down': true
+  'vim-mode:move-left': true
+  'vim-mode:move-right': true
+
 module.exports =
   activate: ({sessionLength}) ->
     @ensureUserInfo =>
@@ -31,6 +37,8 @@ module.exports =
       {type: eventName} = commandEvent
       return if commandEvent.detail?.jQueryTrigger
       return if eventName.startsWith('core:') or eventName.startsWith('editor:')
+      return unless eventName.indexOf(':') > -1
+      return if eventName of IgnoredCommands
       Reporter.sendCommand(eventName)
 
     if atom.getLoadSettings().shellLoadTime?
