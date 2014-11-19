@@ -106,7 +106,7 @@ describe "Metrics", ->
 
     it "reports an exception with the correct type", ->
       message = "Uncaught TypeError: Cannot call method 'getScreenRow' of undefined"
-      window.onerror(message)
+      window.onerror(message, 'abc', 2, 3, {ok: true})
 
       [requestArgs] = Reporter.request.mostRecentCall.args
       expect(requestArgs.url).toContain "t=exception"
@@ -115,7 +115,7 @@ describe "Metrics", ->
     describe "when the message has no clear type", ->
       it "reports an exception with the correct type", ->
         message = ""
-        window.onerror(message)
+        window.onerror(message, 2, 3, {ok: true})
 
         [requestArgs] = Reporter.request.mostRecentCall.args
         expect(requestArgs.url).toContain "t=exception"

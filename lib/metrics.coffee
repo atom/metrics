@@ -28,7 +28,9 @@ module.exports =
     @paneItemSubscription = atom.workspace.onDidAddPaneItem ({item}) ->
       Reporter.sendPaneItem(item)
 
-    @errorSubscription = atom.onDidThrowError (errorMessage) ->
+    @errorSubscription = atom.onDidThrowError (event) ->
+      errorMessage = event
+      errorMessage = event.message if typeof event isnt 'string'
       errorType = errorMessage.split(':')[0] or 'Unknown'
       errorType = errorType.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorType)
