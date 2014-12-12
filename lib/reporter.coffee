@@ -1,4 +1,4 @@
-{$} = require 'atom'
+$ = require 'jquery'
 path = require 'path'
 querystring = require 'querystring'
 
