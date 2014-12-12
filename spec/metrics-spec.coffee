@@ -1,10 +1,9 @@
-{WorkspaceView} = require 'atom'
+$ = require 'jquery'
 Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
   [metrics, workspaceElement] = []
   beforeEach ->
-    atom.workspaceView = new WorkspaceView
     workspaceElement = atom.views.getView(atom.workspace)
 
     spyOn(Reporter, 'request')
@@ -91,7 +90,7 @@ describe "Metrics", ->
 
     it "does not report commands triggered via jquery", ->
       Reporter.request.reset()
-      atom.workspaceView.trigger('some-package:a-command')
+      $(workspaceElement).trigger('some-package:a-command')
       expect(Reporter.request).not.toHaveBeenCalled()
 
   describe "reporting exceptions", ->
