@@ -13,6 +13,8 @@ _Metrics_ section of the Settings view (`cmd-,`).
 * The version of Atom being used
 * The name of each item opened in a pane such as `EditorView`, `SettingsView`,
   and `MarkdownPreviewView`
+* Exception messages (without paths)
+* Commands run (save core commands)
 * The amount of time the current window was open for
 * The amount of time the current window took to load
 * The amount of time the app took to launch
