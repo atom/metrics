@@ -31,9 +31,9 @@ module.exports =
     @errorSubscription = atom.onDidThrowError (event) ->
       errorMessage = event
       errorMessage = event.message if typeof event isnt 'string'
-      errorType = errorMessage.split(':')[0] or 'Unknown'
-      errorType = errorType.replace('Uncaught ', '').slice(0, 150)
-      Reporter.sendException(errorType)
+      errorMessage = stripPath(errorMessage) or 'Unknown'
+      errorMessage = errorMessage.replace('Uncaught ', '').slice(0, 150)
+      Reporter.sendException(errorMessage)
 
     @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
       {type: eventName} = commandEvent
@@ -69,3 +69,7 @@ module.exports =
         callback require('node-uuid').v4()
       else
         callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
+
+PathRE = /'?((\/|\\|[a-z]:\\)[^\s']+)+'?/ig
+stripPath = (message) ->
+  message.replace(PathRE, '<path>')
