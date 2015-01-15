@@ -120,6 +120,31 @@ describe "Metrics", ->
         expect(requestArgs.url).toContain "t=exception"
         expect(requestArgs.url).toContain "exd=Unknown"
 
+    describe "when there are paths in the exception", ->
+      it "strips unix paths surrounded in quotes", ->
+        message = "Error: ENOENT, unlink '/Users/someguy/path/file.js'"
+        window.onerror(message, 2, 3, {ok: true})
+        [requestArgs] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: ENOENT, unlink <path>"
+
+      it "strips unix paths without quotes", ->
+        message = "Uncaught Error: spawn /Users/someguy.omg/path/file-09238_ABC-Final-Final.js ENOENT"
+        window.onerror(message, 2, 3, {ok: true})
+        [requestArgs] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: spawn <path> ENOENT"
+
+      it "strips windows paths without quotes", ->
+        message = "Uncaught Error: spawn c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT"
+        window.onerror(message, 2, 3, {ok: true})
+        [requestArgs] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: spawn <path> ENOENT"
+
+      it "strips windows paths surrounded in quotes", ->
+        message = "Uncaught Error: EACCES 'c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
+        window.onerror(message, 2, 3, {ok: true})
+        [requestArgs] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: EACCES <path>"
+
   describe "when deactivated", ->
     it "stops reporting pane items", ->
       spyOn(Reporter, 'sendPaneItem')
