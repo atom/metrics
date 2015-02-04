@@ -64,11 +64,15 @@ module.exports =
         callback()
 
   createUserId: (callback) ->
-    require('getmac').getMac (error, macAddress) =>
-      if error?
-        callback require('node-uuid').v4()
-      else
-        callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
+    createUUID = -> callback require('node-uuid').v4()
+    try
+      require('getmac').getMac (error, macAddress) =>
+        if error?
+          createUUID()
+        else
+          callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
+    catch e
+      createUUID()
 
 PathRE = /'?((\/|\\|[a-z]:\\)[^\s']+)+'?/ig
 stripPath = (message) ->
