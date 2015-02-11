@@ -2,7 +2,7 @@ $ = require 'jquery'
 Reporter = require '../lib/reporter'
 
 describe "Metrics", ->
-  [metrics, workspaceElement] = []
+  [workspaceElement] = []
   beforeEach ->
     workspaceElement = atom.views.getView(atom.workspace)
 
@@ -168,3 +168,31 @@ describe "Metrics", ->
 
       runs ->
         expect(Reporter.sendPaneItem.callCount).toBe 0
+
+  describe "the metrics-reporter service", ->
+    reporterService = null
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics').then (pack) ->
+          reporterService = pack.mainModule.provideReporter()
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+      runs ->
+        Reporter.request.reset()
+
+    describe "::sendEvent", ->
+      it "makes a request", ->
+        reporterService.sendEvent('cat', 'action', 'label')
+        expect(Reporter.request).toHaveBeenCalled()
+
+    describe "::sendTiming", ->
+      it "makes a request", ->
+        reporterService.sendEvent('cat', 'name')
+        expect(Reporter.request).toHaveBeenCalled()
+
+    describe "::sendException", ->
+      it "makes a request", ->
+        reporterService.sendException('desc')
+        expect(Reporter.request).toHaveBeenCalled()

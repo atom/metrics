@@ -6,11 +6,12 @@ _ = require 'underscore-plus'
 
 module.exports =
   class Reporter
-    @sendEvent: (category, name, value) ->
+    @sendEvent: (category, name, label, value) ->
       params =
         t: 'event'
         ec: category
         ea: name
+        el: label
         ev: value
 
       @send(params)
