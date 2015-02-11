@@ -8,6 +8,13 @@
   "engines": {
     "atom": ">0.50.0"
   },
+  "providedServices": {
+    "metrics-reporter": {
+      "versions": {
+        "1.0.0": "provideReporter"
+      }
+    }
+  },
   "dependencies": {
     "jquery": "^2.0",
     "node-uuid": "~1.4.1",

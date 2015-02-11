@@ -20,10 +20,15 @@ module.exports =
   serialize: ->
     sessionLength: Date.now() - @sessionStart
 
+  provideReporter: ->
+    sendEvent: Reporter.sendEvent.bind(Reporter)
+    sendTiming: Reporter.sendTiming.bind(Reporter)
+    sendException: Reporter.sendException.bind(Reporter)
+
   begin: (sessionLength) ->
     @sessionStart = Date.now()
 
-    Reporter.sendEvent('window', 'ended', sessionLength) if sessionLength
+    Reporter.sendEvent('window', 'ended', null, sessionLength) if sessionLength
     Reporter.sendEvent('window', 'started')
     @paneItemSubscription = atom.workspace.onDidAddPaneItem ({item}) ->
       Reporter.sendPaneItem(item)
