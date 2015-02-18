@@ -1,8 +1,16 @@
-$ = require 'jquery'
 path = require 'path'
 querystring = require 'querystring'
 
-_ = require 'underscore-plus'
+extend = (target, propertyMaps...) ->
+  for propertyMap in propertyMaps
+    for key, value of propertyMap
+      target[key] = value
+  target
+
+post = (url) ->
+  xhr = new XMLHttpRequest()
+  xhr.open("POST", url)
+  xhr.send(null)
 
 module.exports =
   class Reporter
@@ -75,20 +83,18 @@ module.exports =
       @send(params)
 
     @send: (params) ->
-      _.extend(params, @defaultParams())
-      @request
-        type: 'POST'
-        url: "https://www.google-analytics.com/collect?#{querystring.stringify(params)}"
+      extend(params, @defaultParams())
+      @request("https://www.google-analytics.com/collect?#{querystring.stringify(params)}")
 
-    @request: (options) ->
-      $.ajax(options) if navigator.onLine
+    @request: (url) ->
+      post(url) if navigator.onLine
 
     @defaultParams: ->
       params = {}
       params.cd1 = startDate if startDate = localStorage.getItem('metrics.sd')
 
       # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
-      _.extend params,
+      extend params,
         v: 1
         tid: "UA-3769691-33"
         cid: localStorage.getItem('metrics.userId')
