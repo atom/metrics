@@ -16,9 +16,10 @@
     }
   },
   "dependencies": {
-    "jquery": "^2.0",
     "node-uuid": "~1.4.1",
-    "getmac": "~1.0.0",
-    "underscore-plus": "1.x"
+    "getmac": "~1.0.0"
+  },
+  "devDependencies": {
+    "jquery": "^2.0"
   }
 }

@@ -37,9 +37,8 @@ describe "Metrics", ->
       Reporter.request.callCount is 3
 
     runs ->
-      [requestArgs] = Reporter.request.calls[0].args
-      expect(requestArgs.type).toBe 'POST'
-      expect(requestArgs.url).toBeDefined()
+      [url] = Reporter.request.calls[0].args
+      expect(url).toBeDefined()
 
   describe "sending commands", ->
     beforeEach ->
@@ -55,17 +54,17 @@ describe "Metrics", ->
       atom.commands.dispatch(workspaceElement, command, null)
       expect(Reporter.commandCount[command]).toBe 1
 
-      [requestArgs] = Reporter.request.mostRecentCall.args
-      expect(requestArgs.url).toContain "ec=command"
-      expect(requestArgs.url).toContain "ea=some-package"
-      expect(requestArgs.url).toContain "el=some-package%3Aa-command"
-      expect(requestArgs.url).toContain "ev=1"
+      [url] = Reporter.request.mostRecentCall.args
+      expect(url).toContain "ec=command"
+      expect(url).toContain "ea=some-package"
+      expect(url).toContain "el=some-package%3Aa-command"
+      expect(url).toContain "ev=1"
 
       atom.commands.dispatch(workspaceElement, command, null)
       expect(Reporter.commandCount[command]).toBe 2
 
-      [requestArgs] = Reporter.request.mostRecentCall.args
-      expect(requestArgs.url).toContain "ev=2"
+      [url] = Reporter.request.mostRecentCall.args
+      expect(url).toContain "ev=2"
 
     it "does not report editor: and core: commands", ->
       Reporter.request.reset()
@@ -107,43 +106,43 @@ describe "Metrics", ->
       message = "Uncaught TypeError: Cannot call method 'getScreenRow' of undefined"
       window.onerror(message, 'abc', 2, 3, {ok: true})
 
-      [requestArgs] = Reporter.request.mostRecentCall.args
-      expect(requestArgs.url).toContain "t=exception"
-      expect(requestArgs.url).toContain "exd=TypeError"
+      [url] = Reporter.request.mostRecentCall.args
+      expect(url).toContain "t=exception"
+      expect(url).toContain "exd=TypeError"
 
     describe "when the message has no clear type", ->
       it "reports an exception with the correct type", ->
         message = ""
         window.onerror(message, 2, 3, {ok: true})
 
-        [requestArgs] = Reporter.request.mostRecentCall.args
-        expect(requestArgs.url).toContain "t=exception"
-        expect(requestArgs.url).toContain "exd=Unknown"
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "t=exception"
+        expect(url).toContain "exd=Unknown"
 
     describe "when there are paths in the exception", ->
       it "strips unix paths surrounded in quotes", ->
         message = "Error: ENOENT, unlink '/Users/someguy/path/file.js'"
         window.onerror(message, 2, 3, {ok: true})
-        [requestArgs] = Reporter.request.mostRecentCall.args
-        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: ENOENT, unlink <path>"
+        [url] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(url)).toContain "exd=Error: ENOENT, unlink <path>"
 
       it "strips unix paths without quotes", ->
         message = "Uncaught Error: spawn /Users/someguy.omg/path/file-09238_ABC-Final-Final.js ENOENT"
         window.onerror(message, 2, 3, {ok: true})
-        [requestArgs] = Reporter.request.mostRecentCall.args
-        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: spawn <path> ENOENT"
+        [url] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(url)).toContain "exd=Error: spawn <path> ENOENT"
 
       it "strips windows paths without quotes", ->
         message = "Uncaught Error: spawn c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT"
         window.onerror(message, 2, 3, {ok: true})
-        [requestArgs] = Reporter.request.mostRecentCall.args
-        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: spawn <path> ENOENT"
+        [url] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(url)).toContain "exd=Error: spawn <path> ENOENT"
 
       it "strips windows paths surrounded in quotes", ->
         message = "Uncaught Error: EACCES 'c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
         window.onerror(message, 2, 3, {ok: true})
-        [requestArgs] = Reporter.request.mostRecentCall.args
-        expect(decodeURIComponent(requestArgs.url)).toContain "exd=Error: EACCES <path>"
+        [url] = Reporter.request.mostRecentCall.args
+        expect(decodeURIComponent(url)).toContain "exd=Error: EACCES <path>"
 
   describe "when deactivated", ->
     it "stops reporting pane items", ->
