@@ -14,13 +14,13 @@ post = (url) ->
 
 module.exports =
   class Reporter
-    @sendEvent: (category, name, label, value) ->
+    @sendEvent: (category, action, label, value) ->
       params =
         t: 'event'
         ec: category
-        ea: name
-        el: label
-        ev: value
+        ea: action
+      params.el = label if label?
+      params.ev = value if value?
 
       @send(params)
 
