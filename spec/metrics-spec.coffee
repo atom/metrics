@@ -1,6 +1,11 @@
 $ = require 'jquery'
 Reporter = require '../lib/reporter'
 
+activate = () ->
+  atom.config.set("metrics.sendUsageStatistics", true)
+  atom.config.set("metrics.sendExceptions", true)
+  atom.packages.activatePackage('metrics')
+
 describe "Metrics", ->
   [workspaceElement] = []
   beforeEach ->
@@ -21,7 +26,7 @@ describe "Metrics", ->
 
   it "reports events", ->
     waitsForPromise ->
-      atom.packages.activatePackage('metrics')
+      activate()
 
     waitsFor ->
       Reporter.request.callCount is 2
@@ -31,7 +36,7 @@ describe "Metrics", ->
       atom.packages.deactivatePackage('metrics')
 
     waitsForPromise ->
-      atom.packages.activatePackage('metrics')
+      activate()
 
     waitsFor ->
       Reporter.request.callCount is 3
@@ -43,7 +48,7 @@ describe "Metrics", ->
   describe "sending commands", ->
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage('metrics')
+        activate()
 
       waitsFor ->
         Reporter.request.callCount > 0
@@ -97,7 +102,7 @@ describe "Metrics", ->
       spyOn(atom, 'openDevTools')
       spyOn(atom, 'executeJavaScriptInDevTools')
       waitsForPromise ->
-        atom.packages.activatePackage('metrics')
+        activate()
 
       waitsFor ->
         Reporter.request.callCount > 0
@@ -149,7 +154,7 @@ describe "Metrics", ->
       spyOn(Reporter, 'sendPaneItem')
 
       waitsForPromise ->
-        atom.packages.activatePackage('metrics')
+        activate()
 
       waitsFor ->
         Reporter.request.callCount > 0
@@ -172,7 +177,7 @@ describe "Metrics", ->
     reporterService = null
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage('metrics').then (pack) ->
+        activate().then (pack) ->
           reporterService = pack.mainModule.provideReporter()
 
       waitsFor ->
