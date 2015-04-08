@@ -2,8 +2,10 @@
 
 A package that reports usage information to [Google Analytics][GA].
 
-If you do not want this information reported, disable this package from the
-_Metrics_ section of the Settings view (`cmd-,`).
+If you do not want this information reported, you can disable this package.
+Open the Settings View by running the `Settings View: Open` command from the
+Command Palette, go to the Packages section, and then find and disable the 
+Metrics package.
 
 ### Collected Data
 
