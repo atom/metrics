@@ -110,6 +110,8 @@ module.exports =
       {functionName, location, fileName} = stack[i]
       # Empty when it was run from the dev console
       return unless fileName
+      # Continue to next stack entry if call is in node_modules
+      continue if fileName.includes(path.sep + "node_modules" + path.sep)
       for packageName, packagePath of packagePaths
         relativePath = path.relative(packagePath, fileName)
         return packageName unless /^\.\./.test(relativePath)
