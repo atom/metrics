@@ -115,7 +115,7 @@ module.exports =
       for packageName, packagePath of packagePaths
         relativePath = path.relative(packagePath, fileName)
         return packageName unless /^\.\./.test(relativePath)
-      return "Your local #{path.basename(fileName)} file" if atom.getUserInitScriptPath() is fileName
+      return "init-script" if atom.getUserInitScriptPath() is fileName
     return
 
   getPackagePathsByPackageName: ->
