@@ -191,11 +191,12 @@ describe "Metrics", ->
       jasmine.snapshotDeprecations()
       grim.deprecate('bad things are bad', packageName: null)
       jasmine.restoreDeprecationsSnapshot()
+      callCount = Reporter.request.callCount
 
       waits 1
 
       runs ->
-        expect(Reporter.request.callCount).toBe 0
+        expect(Reporter.request.callCount).toBe callCount
 
   describe "when deactivated", ->
     it "stops reporting pane items", ->
