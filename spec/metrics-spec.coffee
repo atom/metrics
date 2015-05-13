@@ -186,6 +186,17 @@ describe "Metrics", ->
         expect(url).toContain "ea=metrics"
         expect(url).toMatch "el=[0-9]+\.[0-9]+\.[0-9]+"
 
+    it "does not report when deprecation has no package name specified", ->
+      Reporter.request.reset()
+      jasmine.snapshotDeprecations()
+      grim.deprecate('bad things are bad', packageName: null)
+      jasmine.restoreDeprecationsSnapshot()
+
+      waits 1
+
+      runs ->
+        expect(Reporter.request.callCount).toBe 0
+
   describe "when deactivated", ->
     it "stops reporting pane items", ->
       spyOn(Reporter, 'sendPaneItem')
