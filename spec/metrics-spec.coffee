@@ -1,5 +1,6 @@
 $ = require 'jquery'
 Reporter = require '../lib/reporter'
+grim = require 'grim'
 
 describe "Metrics", ->
   [workspaceElement] = []
@@ -143,6 +144,47 @@ describe "Metrics", ->
         window.onerror(message, 2, 3, {ok: true})
         [url] = Reporter.request.mostRecentCall.args
         expect(decodeURIComponent(url)).toContain "exd=Error: EACCES <path>"
+
+  describe "reporting deprecations", ->
+    beforeEach ->
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics')
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+    it "reports a deprecation with metadata specified", ->
+      Reporter.request.reset()
+      jasmine.snapshotDeprecations()
+      grim.deprecate('bad things are bad', packageName: 'somepackage')
+      jasmine.restoreDeprecationsSnapshot()
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+      runs ->
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "t=event"
+        expect(url).toContain "ec=deprecation"
+        expect(url).toContain "ea=somepackage"
+        expect(url).toContain "el=unknown"
+
+    it "reports a deprecation without metadata specified", ->
+      Reporter.request.reset()
+      jasmine.snapshotDeprecations()
+      anotherLineInTheStack = -> grim.deprecate('bad things are bad')
+      anotherLineInTheStack()
+      jasmine.restoreDeprecationsSnapshot()
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+      runs ->
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "t=event"
+        expect(url).toContain "ec=deprecation"
+        expect(url).toContain "ea=metrics"
+        expect(url).toMatch "el=[0-9]+\.[0-9]+\.[0-9]+"
 
   describe "when deactivated", ->
     it "stops reporting pane items", ->
