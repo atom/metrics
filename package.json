@@ -17,7 +17,8 @@
   },
   "dependencies": {
     "node-uuid": "~1.4.1",
-    "getmac": "~1.0.0"
+    "getmac": "~1.0.0",
+    "grim": "^1.4.0"
   },
   "devDependencies": {
     "jquery": "^2.0"

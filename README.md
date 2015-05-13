@@ -4,7 +4,7 @@ A package that reports usage information to [Google Analytics][GA].
 
 If you do not want this information reported, you can disable this package.
 Open the Settings View by running the `Settings View: Open` command from the
-Command Palette, go to the Packages section, and then find and disable the 
+Command Palette, go to the Packages section, and then find and disable the
 Metrics package.
 
 ### Collected Data
@@ -20,6 +20,7 @@ Metrics package.
 * The amount of time the current window was open for
 * The amount of time the current window took to load
 * The amount of time the app took to launch
+* Deprecations: package name and version of each deprecation
 
 [GA]: http://www.google.com/analytics
 [MAC]: http://en.wikipedia.org/wiki/MAC_address

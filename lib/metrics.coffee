@@ -1,5 +1,6 @@
 crypto = require 'crypto'
 Reporter = require './reporter'
+grim = require 'grim'
 
 IgnoredCommands =
   'vim-mode:move-up': true
@@ -47,6 +48,15 @@ module.exports =
       return unless eventName.indexOf(':') > -1
       return if eventName of IgnoredCommands
       Reporter.sendCommand(eventName)
+
+    grim.on 'updated', (deprecation) ->
+      setImmediate ->
+        for path, stack of deprecation.stacks
+          packageName = stack.metadata?.packageName
+          pack = atom.packages.getLoadedPackage(packageName)
+          version = pack?.metadata?.version
+          Reporter.sendEvent('deprecation', packageName, version) if packageName?
+          break
 
     if atom.getLoadSettings().shellLoadTime?
       # Only send shell load time for the first window
