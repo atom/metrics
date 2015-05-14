@@ -187,11 +187,15 @@ describe "Metrics", ->
         expect(url).toMatch "el=[0-9]+\.[0-9]+\.[0-9]+"
 
     it "does not report when deprecation has no package name specified", ->
-      Reporter.request.reset()
-      jasmine.snapshotDeprecations()
-      grim.deprecate('bad things are bad', packageName: null)
-      jasmine.restoreDeprecationsSnapshot()
-      callCount = Reporter.request.callCount
+      callCount = null
+      waits 1
+
+      runs ->
+        Reporter.request.reset()
+        jasmine.snapshotDeprecations()
+        grim.deprecate('bad things are bad', packageName: null)
+        callCount = Reporter.request.callCount
+        jasmine.restoreDeprecationsSnapshot()
 
       waits 1
 
