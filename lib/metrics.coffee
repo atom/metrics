@@ -1,5 +1,7 @@
 crypto = require 'crypto'
+path = require 'path'
 Reporter = require './reporter'
+fs = require 'fs-plus'
 grim = require 'grim'
 
 IgnoredCommands =

@@ -16,9 +16,10 @@
     }
   },
   "dependencies": {
-    "node-uuid": "~1.4.1",
+    "fs-plus": "^2.8.0",
     "getmac": "~1.0.0",
-    "grim": "^1.4.0"
+    "grim": "^1.4.0",
+    "node-uuid": "~1.4.1"
   },
   "devDependencies": {
     "jquery": "^2.0"
