@@ -172,8 +172,27 @@ describe "Metrics", ->
     it "reports a deprecation without metadata specified", ->
       Reporter.request.reset()
       jasmine.snapshotDeprecations()
-      anotherLineInTheStack = -> grim.deprecate('bad things are bad')
-      anotherLineInTheStack()
+
+      stack = [
+        {
+          fileName: '/Applications/Atom.app/pathwatcher.js'
+          functionName: 'foo'
+          location: '/Applications/Atom.app/pathwatcher.js:10:5'
+        }
+        {
+          fileName: '/Users/me/.atom/packages/metrics/lib/metrics.js'
+          functionName: 'bar'
+          location: '/Users/me/.atom/packages/metrics/lib/metrics.js:161:5'
+        }
+      ]
+      deprecation =
+        message: "bad things are bad"
+        stacks: [stack]
+      grim.addSerializedDeprecation(deprecation)
+
+      spyOn(atom.packages.getLoadedPackage('metrics').mainModule, 'getPackagePathsByPackageName').andReturn
+        metrics: '/Users/me/.atom/packages/metrics'
+
       jasmine.restoreDeprecationsSnapshot()
 
       waitsFor ->
