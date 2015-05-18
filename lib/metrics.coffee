@@ -89,7 +89,7 @@ module.exports =
     grim.on 'updated', (deprecation) =>
       setImmediate =>
         packageNames = {}
-        for stack in deprecation.getStacks()
+        for __, stack of deprecation.stacks
           packageName = stack.metadata?.packageName ? (@getPackageName(stack) or '').toLowerCase()
           if packageName
             pack = atom.packages.getLoadedPackage(packageName)
@@ -101,15 +101,15 @@ module.exports =
 
         return
 
+  getFileNameFromCallSite: (callsite) ->
+    callsite.fileName ? callsite.getFileName()
+
   getPackageName: (stack) ->
     resourcePath = atom.getLoadSettings().resourcePath
     packagePaths = @getPackagePathsByPackageName()
-    for packageName, packagePath of packagePaths
-      if packagePath.indexOf('.atom/dev/packages') > -1 or packagePath.indexOf('.atom/packages') > -1
-        packagePaths[packageName] = fs.absolute(packagePath)
 
     for i in [1...stack.length]
-      {functionName, location, fileName} = stack[i]
+      fileName = @getFileNameFromCallSite(stack[i])
       # Empty when it was run from the dev console
       return unless fileName
       # Continue to next stack entry if call is in node_modules
@@ -125,6 +125,8 @@ module.exports =
     @packagePathsByPackageName = {}
     for pack in atom.packages.getLoadedPackages()
       @packagePathsByPackageName[pack.name] = pack.path
+      if pack.path.indexOf('.atom/dev/packages') > -1 or pack.path.indexOf('.atom/packages') > -1
+        packagePaths[pack.name] = fs.absolute(pack.path)
     @packagePathsByPackageName
 
 PathRE = /'?((\/|\\|[a-z]:\\)[^\s']+)+'?/ig
