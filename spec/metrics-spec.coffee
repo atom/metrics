@@ -176,9 +176,13 @@ describe "Metrics", ->
       stack = [
         {
           fileName: '/Applications/Atom.app/pathwatcher.js'
+          functionName: 'foo'
+          location: '/Applications/Atom.app/pathwatcher.js:10:5'
         }
         {
           fileName: '/Users/me/.atom/packages/metrics/lib/metrics.js'
+          functionName: 'bar'
+          location: '/Users/me/.atom/packages/metrics/lib/metrics.js:161:5'
         }
       ]
       deprecation =
