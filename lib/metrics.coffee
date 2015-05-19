@@ -43,14 +43,7 @@ module.exports =
       errorMessage = errorMessage.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorMessage)
 
-    @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
-      {type: eventName} = commandEvent
-      return if commandEvent.detail?.jQueryTrigger
-      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
-      return unless eventName.indexOf(':') > -1
-      return if eventName of IgnoredCommands
-      Reporter.sendCommand(eventName)
-
+    @watchCommands()
     @watchDeprecations()
 
     if atom.getLoadSettings().shellLoadTime?
@@ -83,6 +76,29 @@ module.exports =
           callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
     catch e
       createUUID()
+
+  getUserId: ->
+    userId = localStorage.getItem('metrics.userId')
+
+  shouldWatchEvents: ->
+    userId = @getUserId()
+    if userId
+      seed = 'the5%'
+      {crc32} = require 'crc'
+      checksum = crc32(userId + seed)
+      checksum % 100 < 5
+    else
+      false
+
+  watchCommands: ->
+    return unless @shouldWatchEvents()
+    @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
+      {type: eventName} = commandEvent
+      return if commandEvent.detail?.jQueryTrigger
+      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
+      return unless eventName.indexOf(':') > -1
+      return if eventName of IgnoredCommands
+      Reporter.sendCommand(eventName)
 
   # TODO: Remove these deprecation tracking methods after we remove 1.0 deprecations
   watchDeprecations: ->

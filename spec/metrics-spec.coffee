@@ -42,56 +42,83 @@ describe "Metrics", ->
       expect(url).toBeDefined()
 
   describe "sending commands", ->
-    beforeEach ->
-      waitsForPromise ->
-        atom.packages.activatePackage('metrics')
+    describe "when the user is NOT chosen to send commands", ->
+      beforeEach ->
+        localStorage.setItem('metrics.userId', 'a')
 
-      waitsFor ->
-        Reporter.request.callCount > 0
+        waitsForPromise ->
+          atom.packages.activatePackage('metrics')
 
-    it "reports commands dispatched via atom.commands", ->
-      command = 'some-package:a-command'
+        waitsFor ->
+          Reporter.request.callCount > 0
 
-      atom.commands.dispatch(workspaceElement, command, null)
-      expect(Reporter.commandCount[command]).toBe 1
+        runs ->
+          Metrics = atom.packages.getLoadedPackage('metrics').mainModule
+          expect(Metrics.shouldWatchEvents()).toBe false
 
-      [url] = Reporter.request.mostRecentCall.args
-      expect(url).toContain "ec=command"
-      expect(url).toContain "ea=some-package"
-      expect(url).toContain "el=some-package%3Aa-command"
-      expect(url).toContain "ev=1"
+      it "does not watch for commands", ->
+        command = 'some-package:a-command'
 
-      atom.commands.dispatch(workspaceElement, command, null)
-      expect(Reporter.commandCount[command]).toBe 2
+        atom.commands.dispatch(workspaceElement, command, null)
+        expect(Reporter.commandCount).toBeUndefined()
 
-      [url] = Reporter.request.mostRecentCall.args
-      expect(url).toContain "ev=2"
+    describe "when the user is chosen to send commands", ->
+      beforeEach ->
+        localStorage.setItem('metrics.userId', 'd')
 
-    it "does not report editor: and core: commands", ->
-      Reporter.request.reset()
-      atom.commands.dispatch(workspaceElement, 'core:move-up', null)
-      expect(Reporter.request).not.toHaveBeenCalled()
+        waitsForPromise ->
+          atom.packages.activatePackage('metrics')
 
-      atom.commands.dispatch(workspaceElement, 'editor:move-to-end-of-line', null)
-      expect(Reporter.request).not.toHaveBeenCalled()
+        waitsFor ->
+          Reporter.request.callCount > 0
 
-    it "does not report non-namespaced commands", ->
-      Reporter.request.reset()
-      atom.commands.dispatch(workspaceElement, 'dragover', null)
-      expect(Reporter.request).not.toHaveBeenCalled()
+        runs ->
+          Metrics = atom.packages.getLoadedPackage('metrics').mainModule
+          expect(Metrics.shouldWatchEvents()).toBe true
 
-    it "does not report vim-mode:* movement commands", ->
-      Reporter.request.reset()
-      atom.commands.dispatch(workspaceElement, 'vim-mode:move-up', null)
-      atom.commands.dispatch(workspaceElement, 'vim-mode:move-down', null)
-      atom.commands.dispatch(workspaceElement, 'vim-mode:move-left', null)
-      atom.commands.dispatch(workspaceElement, 'vim-mode:move-right', null)
-      expect(Reporter.request).not.toHaveBeenCalled()
+      it "reports commands dispatched via atom.commands", ->
+        command = 'some-package:a-command'
 
-    it "does not report commands triggered via jquery", ->
-      Reporter.request.reset()
-      $(workspaceElement).trigger('some-package:a-command')
-      expect(Reporter.request).not.toHaveBeenCalled()
+        atom.commands.dispatch(workspaceElement, command, null)
+        expect(Reporter.commandCount[command]).toBe 1
+
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "ec=command"
+        expect(url).toContain "ea=some-package"
+        expect(url).toContain "el=some-package%3Aa-command"
+        expect(url).toContain "ev=1"
+
+        atom.commands.dispatch(workspaceElement, command, null)
+        expect(Reporter.commandCount[command]).toBe 2
+
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "ev=2"
+
+      it "does not report editor: and core: commands", ->
+        Reporter.request.reset()
+        atom.commands.dispatch(workspaceElement, 'core:move-up', null)
+        expect(Reporter.request).not.toHaveBeenCalled()
+
+        atom.commands.dispatch(workspaceElement, 'editor:move-to-end-of-line', null)
+        expect(Reporter.request).not.toHaveBeenCalled()
+
+      it "does not report non-namespaced commands", ->
+        Reporter.request.reset()
+        atom.commands.dispatch(workspaceElement, 'dragover', null)
+        expect(Reporter.request).not.toHaveBeenCalled()
+
+      it "does not report vim-mode:* movement commands", ->
+        Reporter.request.reset()
+        atom.commands.dispatch(workspaceElement, 'vim-mode:move-up', null)
+        atom.commands.dispatch(workspaceElement, 'vim-mode:move-down', null)
+        atom.commands.dispatch(workspaceElement, 'vim-mode:move-left', null)
+        atom.commands.dispatch(workspaceElement, 'vim-mode:move-right', null)
+        expect(Reporter.request).not.toHaveBeenCalled()
+
+      it "does not report commands triggered via jquery", ->
+        Reporter.request.reset()
+        $(workspaceElement).trigger('some-package:a-command')
+        expect(Reporter.request).not.toHaveBeenCalled()
 
   describe "reporting exceptions", ->
     beforeEach ->
