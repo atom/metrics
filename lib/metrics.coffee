@@ -1,3 +1,5 @@
+{CompositeDisposable} = require 'atom'
+
 crypto = require 'crypto'
 path = require 'path'
 Reporter = require './reporter'
@@ -12,13 +14,12 @@ IgnoredCommands =
 
 module.exports =
   activate: ({sessionLength}) ->
+    @subscriptions = new CompositeDisposable
     @ensureUserInfo =>
       @begin(sessionLength)
 
   deactivate: ->
-    @errorSubscription?.dispose()
-    @paneItemSubscription?.dispose()
-    @commandSubscription?.dispose()
+    @subscriptions?.dispose()
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
@@ -33,16 +34,15 @@ module.exports =
 
     Reporter.sendEvent('window', 'ended', null, sessionLength) if sessionLength
     Reporter.sendEvent('window', 'started')
-    @paneItemSubscription = atom.workspace.onDidAddPaneItem ({item}) ->
-      Reporter.sendPaneItem(item)
 
-    @errorSubscription = atom.onDidThrowError (event) ->
+    @subscriptions.add atom.onDidThrowError (event) ->
       errorMessage = event
       errorMessage = event.message if typeof event isnt 'string'
       errorMessage = stripPath(errorMessage) or 'Unknown'
       errorMessage = errorMessage.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorMessage)
 
+    @watchPaneItems()
     @watchCommands()
     @watchDeprecations()
 
@@ -90,9 +90,14 @@ module.exports =
     else
       false
 
+  watchPaneItems: ->
+    return unless @shouldWatchEvents()
+    @subscriptions.add atom.workspace.onDidAddPaneItem ({item}) ->
+      Reporter.sendPaneItem(item)
+
   watchCommands: ->
     return unless @shouldWatchEvents()
-    @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
+    @subscriptions.add atom.commands.onWillDispatch (commandEvent) ->
       {type: eventName} = commandEvent
       return if commandEvent.detail?.jQueryTrigger
       return if eventName.startsWith('core:') or eventName.startsWith('editor:')

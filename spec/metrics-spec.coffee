@@ -41,7 +41,7 @@ describe "Metrics", ->
       [url] = Reporter.request.calls[0].args
       expect(url).toBeDefined()
 
-  describe "sending commands", ->
+  describe "reporting commands", ->
     describe "when the user is NOT chosen to send commands", ->
       beforeEach ->
         localStorage.setItem('metrics.userId', 'a')
@@ -232,8 +232,46 @@ describe "Metrics", ->
         expect(url).toMatch "ea=metrics%40[0-9]+\.[0-9]+\.[0-9]+"
         expect(url).toContain "el=bad%20things%20are%20bad"
 
+  describe "reporting pane items", ->
+    describe "when the user is NOT chosen to send events", ->
+      beforeEach ->
+        localStorage.setItem('metrics.userId', 'a')
+        spyOn(Reporter, 'sendPaneItem')
+
+        waitsForPromise ->
+          atom.packages.activatePackage('metrics')
+
+        waitsFor ->
+          Reporter.request.callCount > 0
+
+      it "will not report pane items", ->
+        waitsForPromise ->
+          atom.workspace.open('file1.txt')
+
+        runs ->
+          expect(Reporter.sendPaneItem.callCount).toBe 0
+
+    describe "when the user is NOT chosen to send events", ->
+      beforeEach ->
+        localStorage.setItem('metrics.userId', 'd')
+        spyOn(Reporter, 'sendPaneItem')
+
+        waitsForPromise ->
+          atom.packages.activatePackage('metrics')
+
+        waitsFor ->
+          Reporter.request.callCount > 0
+
+      it "will not report pane items", ->
+        waitsForPromise ->
+          atom.workspace.open('file1.txt')
+
+        runs ->
+          expect(Reporter.sendPaneItem.callCount).toBe 1
+
   describe "when deactivated", ->
     it "stops reporting pane items", ->
+      localStorage.setItem('metrics.userId', 'd')
       spyOn(Reporter, 'sendPaneItem')
 
       waitsForPromise ->
