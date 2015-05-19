@@ -166,8 +166,8 @@ describe "Metrics", ->
         [url] = Reporter.request.mostRecentCall.args
         expect(url).toContain "t=event"
         expect(url).toContain "ec=deprecation"
-        expect(url).toContain "ea=somepackage"
-        expect(url).toContain "el=unknown"
+        expect(url).toContain "ea=somepackage%40unknown"
+        expect(url).toContain "el=bad%20things%20are%20bad"
 
     it "reports a deprecation without metadata specified", ->
       Reporter.request.reset()
@@ -202,8 +202,8 @@ describe "Metrics", ->
         [url] = Reporter.request.mostRecentCall.args
         expect(url).toContain "t=event"
         expect(url).toContain "ec=deprecation"
-        expect(url).toContain "ea=metrics"
-        expect(url).toMatch "el=[0-9]+\.[0-9]+\.[0-9]+"
+        expect(url).toMatch "ea=metrics%40[0-9]+\.[0-9]+\.[0-9]+"
+        expect(url).toContain "el=bad%20things%20are%20bad"
 
   describe "when deactivated", ->
     it "stops reporting pane items", ->
