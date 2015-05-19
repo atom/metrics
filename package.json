@@ -16,6 +16,7 @@
     }
   },
   "dependencies": {
+    "crc": "^3.1.0",
     "fs-plus": "^2.8.0",
     "getmac": "~1.0.0",
     "grim": "^1.4.0",

@@ -1,3 +1,5 @@
+{CompositeDisposable} = require 'atom'
+
 crypto = require 'crypto'
 path = require 'path'
 Reporter = require './reporter'
@@ -12,13 +14,12 @@ IgnoredCommands =
 
 module.exports =
   activate: ({sessionLength}) ->
+    @subscriptions = new CompositeDisposable
     @ensureUserInfo =>
       @begin(sessionLength)
 
   deactivate: ->
-    @errorSubscription?.dispose()
-    @paneItemSubscription?.dispose()
-    @commandSubscription?.dispose()
+    @subscriptions?.dispose()
 
   serialize: ->
     sessionLength: Date.now() - @sessionStart
@@ -33,24 +34,16 @@ module.exports =
 
     Reporter.sendEvent('window', 'ended', null, sessionLength) if sessionLength
     Reporter.sendEvent('window', 'started')
-    @paneItemSubscription = atom.workspace.onDidAddPaneItem ({item}) ->
-      Reporter.sendPaneItem(item)
 
-    @errorSubscription = atom.onDidThrowError (event) ->
+    @subscriptions.add atom.onDidThrowError (event) ->
       errorMessage = event
       errorMessage = event.message if typeof event isnt 'string'
       errorMessage = stripPath(errorMessage) or 'Unknown'
       errorMessage = errorMessage.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorMessage)
 
-    @commandSubscription = atom.commands.onWillDispatch (commandEvent) ->
-      {type: eventName} = commandEvent
-      return if commandEvent.detail?.jQueryTrigger
-      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
-      return unless eventName.indexOf(':') > -1
-      return if eventName of IgnoredCommands
-      Reporter.sendCommand(eventName)
-
+    @watchPaneItems()
+    @watchCommands()
     @watchDeprecations()
 
     if atom.getLoadSettings().shellLoadTime?
@@ -83,6 +76,34 @@ module.exports =
           callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
     catch e
       createUUID()
+
+  getUserId: ->
+    userId = localStorage.getItem('metrics.userId')
+
+  shouldWatchEvents: ->
+    userId = @getUserId()
+    if userId
+      seed = 'the5%'
+      {crc32} = require 'crc'
+      checksum = crc32(userId + seed)
+      checksum % 100 < 5
+    else
+      false
+
+  watchPaneItems: ->
+    return unless @shouldWatchEvents()
+    @subscriptions.add atom.workspace.onDidAddPaneItem ({item}) ->
+      Reporter.sendPaneItem(item)
+
+  watchCommands: ->
+    return unless @shouldWatchEvents()
+    @subscriptions.add atom.commands.onWillDispatch (commandEvent) ->
+      {type: eventName} = commandEvent
+      return if commandEvent.detail?.jQueryTrigger
+      return if eventName.startsWith('core:') or eventName.startsWith('editor:')
+      return unless eventName.indexOf(':') > -1
+      return if eventName of IgnoredCommands
+      Reporter.sendCommand(eventName)
 
   # TODO: Remove these deprecation tracking methods after we remove 1.0 deprecations
   watchDeprecations: ->
