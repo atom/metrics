@@ -86,18 +86,23 @@ module.exports =
 
   # TODO: Remove these deprecation tracking methods after we remove 1.0 deprecations
   watchDeprecations: ->
+    @deprecationCache = {}
     grim.on 'updated', (deprecation) =>
       setImmediate =>
         packageNames = {}
+        message = deprecation.getMessage()[0...500]
+
         for __, stack of deprecation.stacks
           packageName = stack.metadata?.packageName ? (@getPackageName(stack) or '').toLowerCase()
-          if packageName
-            pack = atom.packages.getLoadedPackage(packageName)
-            version = pack?.metadata?.version
-            packageNames[packageName] = version or 'unknown'
+          continue unless packageName
 
-        for packageName, version of packageNames
-          Reporter.sendEvent('deprecation', packageName, version) if packageName?
+          pack = atom.packages.getLoadedPackage(packageName)
+          version = pack?.metadata?.version or 'unknown'
+          nameAndVersion = "#{packageName}@#{version}"
+
+          unless @deprecationCache[nameAndVersion + message]?
+            @deprecationCache[nameAndVersion + message] = true
+            Reporter.sendEvent('deprecation', nameAndVersion, message)
 
         return
 
@@ -126,7 +131,7 @@ module.exports =
     for pack in atom.packages.getLoadedPackages()
       @packagePathsByPackageName[pack.name] = pack.path
       if pack.path.indexOf('.atom/dev/packages') > -1 or pack.path.indexOf('.atom/packages') > -1
-        packagePaths[pack.name] = fs.absolute(pack.path)
+        @packagePathsByPackageName[pack.name] = fs.absolute(pack.path)
     @packagePathsByPackageName
 
 PathRE = /'?((\/|\\|[a-z]:\\)[^\s']+)+'?/ig
