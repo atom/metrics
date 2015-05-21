@@ -147,7 +147,7 @@ module.exports =
 
       unless @deprecationCache[nameAndVersion + message]?
         @deprecationCache[nameAndVersion + message] = true
-        Reporter.sendEvent('deprecation-v2', nameAndVersion, message)
+        Reporter.sendEvent('deprecation-v3', nameAndVersion, message)
 
     return
 
