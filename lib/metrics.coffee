@@ -108,24 +108,48 @@ module.exports =
   # TODO: Remove these deprecation tracking methods after we remove 1.0 deprecations
   watchDeprecations: ->
     @deprecationCache = {}
-    grim.on 'updated', (deprecation) =>
+    @packageVersionCache = {}
+
+    atom.packages.onDidActivateInitialPackages =>
+      packages = atom.packages.getLoadedPackages()
+      for pack in packages
+        @packageVersionCache[pack.name] = pack?.metadata?.version or 'unknown'
+
+      # Reports initial deprecations as deprecations may have happened before metrics activation.
       setImmediate =>
-        packageNames = {}
-        message = deprecation.getMessage()[0...500]
-
-        for __, stack of deprecation.stacks
-          packageName = stack.metadata?.packageName ? (@getPackageName(stack) or '').toLowerCase()
-          continue unless packageName
-
-          pack = atom.packages.getLoadedPackage(packageName)
-          version = pack?.metadata?.version or 'unknown'
-          nameAndVersion = "#{packageName}@#{version}"
-
-          unless @deprecationCache[nameAndVersion + message]?
-            @deprecationCache[nameAndVersion + message] = true
-            Reporter.sendEvent('deprecation-v2', nameAndVersion, message)
-
+        for deprecation in grim.getDeprecations()
+          @reportDeprecation(deprecation)
         return
+
+      return
+
+    atom.packages.onDidLoadPackage (pack) =>
+      unless @packageVersionCache[pack.name]
+        @packageVersionCache[pack.name] = pack?.metadata?.version or 'unknown'
+
+    grim.on 'updated', (deprecation) =>
+      setImmediate => @reportDeprecation(deprecation)
+
+  reportDeprecation: (deprecation) ->
+    packageNames = {}
+    message = deprecation.getMessage()[0...500]
+
+    for __, stack of deprecation.stacks
+      packageName = stack.metadata?.packageName ? (@getPackageName(stack) or '').toLowerCase()
+      continue unless packageName
+
+      unless @packageVersionCache[packageName]
+        pack = atom.packages.getLoadedPackage(packageName)
+        @packageVersionCache[packageName] = pack?.metadata?.version or 'unknown'
+
+      version = @packageVersionCache[packageName]
+      nameAndVersion = "#{packageName}@#{version}"
+
+      unless @deprecationCache[nameAndVersion + message]?
+        @deprecationCache[nameAndVersion + message] = true
+        Reporter.sendEvent('deprecation-v2', nameAndVersion, message)
+
+    return
 
   getFileNameFromCallSite: (callsite) ->
     callsite.fileName ? callsite.getFileName()
