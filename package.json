@@ -23,6 +23,7 @@
     "node-uuid": "~1.4.1"
   },
   "devDependencies": {
+    "coffeelint": "^1.9.7",
     "jquery": "^2.0"
   }
 }

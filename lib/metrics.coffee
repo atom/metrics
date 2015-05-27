@@ -62,14 +62,14 @@ module.exports =
       localStorage.setItem('metrics.userId', atom.config.get('metrics.userId'))
       callback()
     else
-      @createUserId (userId) =>
+      @createUserId (userId) ->
         localStorage.setItem('metrics.userId', userId)
         callback()
 
   createUserId: (callback) ->
     createUUID = -> callback require('node-uuid').v4()
     try
-      require('getmac').getMac (error, macAddress) =>
+      require('getmac').getMac (error, macAddress) ->
         if error?
           createUUID()
         else
