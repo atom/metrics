@@ -73,7 +73,7 @@ module.exports =
         if error?
           createUUID()
         else
-          callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
+          callback crypto.createHash('sha256').update(macAddress, 'utf8').digest('hex')
     catch e
       createUUID()
 
