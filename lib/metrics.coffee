@@ -67,15 +67,7 @@ module.exports =
         callback()
 
   createUserId: (callback) ->
-    createUUID = -> callback require('node-uuid').v4()
-    try
-      require('getmac').getMac (error, macAddress) ->
-        if error?
-          createUUID()
-        else
-          callback crypto.createHash('sha1').update(macAddress, 'utf8').digest('hex')
-    catch e
-      createUUID()
+    callback require('node-uuid').v4()
 
   getUserId: ->
     userId = localStorage.getItem('metrics.userId')
