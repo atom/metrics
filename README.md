@@ -12,8 +12,8 @@ Metrics package.
 * A unique UUID v4 random identifier is generated according to [RFC4122][RFC4122]
 * The screen width and height
 * The version of Atom being used
-* The name of each item opened in a pane such as `EditorView`, `SettingsView`,
-  and `MarkdownPreviewView`
+* The name of each view class or atom configuration file opened in a pane, e.g. `EditorView`, `SettingsView`,
+  `MarkdownPreviewView`, and `UserKeymap`. No other pane item information is collected.
 * Exception messages (without paths)
 * Commands run (save core commands)
 * The amount of time the current window was open for
