@@ -41,6 +41,46 @@ describe "Metrics", ->
       [url] = Reporter.request.calls[0].args
       expect(url).toBeDefined()
 
+  describe "reporting release channel", ->
+    beforeEach ->
+      localStorage.setItem('metrics.userId', 'a')
+
+    it "reports the dev release channel", ->
+      spyOn(atom, 'getVersion').andReturn '1.0.2-dev-dedbeef'
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics')
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+      runs ->
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "aiid=dev"
+
+    it "reports the beta release channel", ->
+      spyOn(atom, 'getVersion').andReturn '1.0.2-beta1'
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics')
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+      runs ->
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "aiid=beta"
+
+    it "reports the stable release channel", ->
+      spyOn(atom, 'getVersion').andReturn '1.0.2'
+      waitsForPromise ->
+        atom.packages.activatePackage('metrics')
+
+      waitsFor ->
+        Reporter.request.callCount > 0
+
+      runs ->
+        [url] = Reporter.request.mostRecentCall.args
+        expect(url).toContain "aiid=stable"
+
   describe "reporting commands", ->
     describe "when the user is NOT chosen to send commands", ->
       beforeEach ->
