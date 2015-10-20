@@ -12,6 +12,15 @@ post = (url) ->
   xhr.open("POST", url)
   xhr.send(null)
 
+getReleaseChannel = ->
+  version = atom.getVersion()
+  if version.indexOf('beta') > -1
+    'beta'
+  else if version.indexOf('dev') > -1
+    'dev'
+  else
+    'stable'
+
 module.exports =
   class Reporter
     @sendEvent: (category, action, label, value) ->
@@ -101,3 +110,4 @@ module.exports =
         an: 'atom'
         av: atom.getVersion()
         sr: "#{screen.width}x#{screen.height}"
+        aiid: getReleaseChannel()

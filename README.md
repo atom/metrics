@@ -19,6 +19,7 @@ Metrics package.
 * The amount of time the current window was open for
 * The amount of time the current window took to load
 * The amount of time the app took to launch
+* The app's release channel (stable, beta, dev)
 * Deprecations: package name and version of each deprecation
 
 [GA]: http://www.google.com/analytics
