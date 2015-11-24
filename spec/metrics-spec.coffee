@@ -162,7 +162,7 @@ describe "Metrics", ->
 
   describe "reporting exceptions", ->
     beforeEach ->
-      spyOn(atom, 'openDevTools')
+      spyOn(atom, 'openDevTools').andReturn(Promise.resolve())
       spyOn(atom, 'executeJavaScriptInDevTools')
       waitsForPromise ->
         atom.packages.activatePackage('metrics')
