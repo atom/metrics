@@ -41,6 +41,28 @@ describe "Metrics", ->
       [url] = Reporter.request.calls[0].args
       expect(url).toBeDefined()
 
+  it "reports over SSL", ->
+    waitsForPromise ->
+      atom.packages.activatePackage('metrics')
+
+    waitsFor ->
+      Reporter.request.callCount > 0
+
+    runs ->
+      [url] = Reporter.request.mostRecentCall.args
+      expect(url).toMatch('^https:\/\/ssl.google-analytics.com\/collect\?')
+
+  it "specifies anonymization", ->
+    waitsForPromise ->
+      atom.packages.activatePackage('metrics')
+
+    waitsFor ->
+      Reporter.request.callCount > 0
+
+    runs ->
+      [url] = Reporter.request.mostRecentCall.args
+      expect(url).toContain('&aip=1&')
+
   describe "reporting release channel", ->
     beforeEach ->
       localStorage.setItem('metrics.userId', 'a')
