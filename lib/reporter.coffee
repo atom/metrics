@@ -93,7 +93,7 @@ module.exports =
 
     @send: (params) ->
       extend(params, @defaultParams())
-      @request("https://www.google-analytics.com/collect?#{querystring.stringify(params)}")
+      @request("https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}")
 
     @request: (url) ->
       post(url) if navigator.onLine
@@ -105,6 +105,7 @@ module.exports =
       # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
       extend params,
         v: 1
+        aip: 1
         tid: "UA-3769691-33"
         cid: localStorage.getItem('metrics.userId')
         an: 'atom'
