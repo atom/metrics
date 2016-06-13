@@ -20,5 +20,4 @@ If you do not want this information reported, you can disable this package. Open
 * Deprecated package names and versions
 
 [GA]: http://www.google.com/analytics
-[MAC]: http://en.wikipedia.org/wiki/MAC_address
 [RFC4122]: http://www.ietf.org/rfc/rfc4122.txt
