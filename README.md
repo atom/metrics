@@ -8,10 +8,12 @@ If you do not want this information reported, you can disable this package. Open
 ### Collected data
 
 * A unique UUID v4 random identifier is generated according to [RFC4122][RFC4122]
-* Screen width and height
+* Screen and window width and height
 * Version of Atom being used
 * Name of each Atom view class or Atom configuration file opened in a pane, e.g. `EditorView`, `SettingsView`, `MarkdownPreviewView`, and `UserKeymap`. **No other pane item information is collected.**
 * Exception messages (without paths)
+* Locale (language and variant)
+* Heap memory used as MB and %
 * Commands run (save core commands)
 * Amount of time the current window was open for
 * Amount of time the current window took to load
