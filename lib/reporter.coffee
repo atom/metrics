@@ -1,8 +1,5 @@
 path = require 'path'
 querystring = require 'querystring'
-remote = require 'remote'
-
-userLocale = remote.app.getLocale()
 
 extend = (target, propertyMaps...) ->
   for propertyMap in propertyMaps
@@ -118,7 +115,6 @@ module.exports =
         tid: "UA-3769691-33"
         cid: localStorage.getItem('metrics.userId')
         an: 'atom'
-        ul: userLocale
         av: atom.getVersion()
         sr: "#{screen.width}x#{screen.height}"
         vp: "#{innerWidth}x#{innerHeight}"

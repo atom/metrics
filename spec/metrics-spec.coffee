@@ -99,17 +99,6 @@ describe "Metrics", ->
       expect(url).toContain("&cm1=117&")
       expect(url).toContain("&cm2=53&")
 
-  it "specifies language locale", ->
-    waitsForPromise ->
-      atom.packages.activatePackage('metrics')
-
-    waitsFor ->
-      Reporter.request.callCount > 0
-
-    runs ->
-      [url] = Reporter.request.mostRecentCall.args
-      expect(url).toContain("&ul=en-US&")
-
   describe "reporting release channel", ->
     beforeEach ->
       localStorage.setItem('metrics.userId', 'a')
