@@ -74,7 +74,10 @@ module.exports =
       params =
         t: 'appview'
         cd: @viewNameForPaneItem(item)
-        dt: item.getGrammar?()?.name
+
+      grammarName = item.getGrammar?()?.name
+      if grammarName?
+        params.dt = grammarName
       @send(params)
 
     @sendCommand: (commandName) ->
@@ -101,6 +104,9 @@ module.exports =
     @defaultParams: ->
       params = {}
       params.cd1 = startDate if startDate = localStorage.getItem('metrics.sd')
+      memUse = process.memoryUsage()
+      params.cm1 = memUse.heapUsed >> 20 # Convert bytes to megabytes
+      params.cm2 = Math.round((memUse.heapUsed / memUse.heapTotal) * 100)
 
       # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
       extend params,
@@ -111,4 +117,5 @@ module.exports =
         an: 'atom'
         av: atom.getVersion()
         sr: "#{screen.width}x#{screen.height}"
+        vp: "#{innerWidth}x#{innerHeight}"
         aiid: getReleaseChannel()
