@@ -9,7 +9,7 @@ extend = (target, propertyMaps...) ->
 
 post = (url) ->
   xhr = new XMLHttpRequest()
-  xhr.open("POST", url)
+  xhr.open('POST', url)
   xhr.send(null)
 
 getReleaseChannel = ->
@@ -21,9 +21,9 @@ getReleaseChannel = ->
   else
     'stable'
 
-shouldReport = (error) ->
+consented = ->
   atom.config.get('core.telemetryConsent') is 'limited'
-  
+
 module.exports =
   class Reporter
     @sendEvent: (category, action, label, value) ->
@@ -98,27 +98,34 @@ module.exports =
       @send(params)
 
     @send: (params) ->
-      extend(params, @defaultParams())
-      @request("https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}")
+      if navigator.onLine
+        extend(params, @minimumParams)
+        extend(params, @consentedParams()) if consented
+        @request params if consented or @isTelemetryConsentChoice(params)
 
-    @request: (url) ->
-      post(url) if shouldReport and navigator.onLine
+    @isTelemetryConsentChoice: (params) ->
+      params.t is 'event' and params.ec is 'setting' and params.ea is 'core.telemetryConsent'
 
-    @defaultParams: ->
-      params = {}
-      params.cd1 = startDate if startDate = localStorage.getItem('metrics.sd')
+    @request: (params) ->
+      post("https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}")
+
+    @consentedParams: ->
       memUse = process.memoryUsage()
-      params.cm1 = memUse.heapUsed >> 20 # Convert bytes to megabytes
-      params.cm2 = Math.round((memUse.heapUsed / memUse.heapTotal) * 100)
-
-      # https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
-      extend params,
-        v: 1
-        aip: 1
-        tid: "UA-3769691-33"
-        cid: localStorage.getItem('metrics.userId')
-        an: 'atom'
-        av: atom.getVersion()
+      {
+        cd1: startDate if startDate = localStorage.getItem('metrics.sd')
+        cm1: memUse.heapUsed >> 20 # Convert bytes to megabytes
+        cm2: Math.round((memUse.heapUsed / memUse.heapTotal) * 100)
         sr: "#{screen.width}x#{screen.height}"
         vp: "#{innerWidth}x#{innerHeight}"
         aiid: getReleaseChannel()
+      }
+
+    @minimumParams =
+      {
+        v: 1
+        aip: 1
+        tid: 'UA-3769691-33'
+        cid: localStorage.getItem('metrics.userId')
+        an: 'atom'
+        av: atom.getVersion()
+      }

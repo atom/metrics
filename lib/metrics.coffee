@@ -42,6 +42,9 @@ module.exports =
       errorMessage = errorMessage.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorMessage)
 
+    @subscriptions.add atom.config.onDidChange 'core.telemetryConsent', ({newValue, oldValue}) ->
+      Reporter.sendEvent 'setting', 'core.telemetryConsent', newValue unless newValue is 'undecided'
+
     @watchPaneItems()
     @watchCommands()
     @watchDeprecations()
