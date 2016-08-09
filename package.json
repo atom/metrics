@@ -2,7 +2,7 @@
   "name": "metrics",
   "main": "./lib/metrics",
   "version": "0.53.1",
-  "description": "Reports usage information to Google Analytics",
+  "description": "Help improve Atom by sending usage statistics, exceptions and deprecations to the team",
   "repository": "https://github.com/atom/metrics",
   "license": "MIT",
   "engines": {

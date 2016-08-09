@@ -21,6 +21,9 @@ getReleaseChannel = ->
   else
     'stable'
 
+shouldReport = (error) ->
+  atom.config.get('core.telemetryConsent') is 'limited'
+  
 module.exports =
   class Reporter
     @sendEvent: (category, action, label, value) ->
@@ -99,7 +102,7 @@ module.exports =
       @request("https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}")
 
     @request: (url) ->
-      post(url) if navigator.onLine
+      post(url) if shouldReport and navigator.onLine
 
     @defaultParams: ->
       params = {}
