@@ -1,6 +1,5 @@
 {CompositeDisposable} = require 'atom'
 
-crypto = require 'crypto'
 path = require 'path'
 Reporter = require './reporter'
 fs = require 'fs-plus'
@@ -70,7 +69,7 @@ module.exports =
     callback require('node-uuid').v4()
 
   getUserId: ->
-    userId = localStorage.getItem('metrics.userId')
+    localStorage.getItem('metrics.userId')
 
   shouldWatchEvents: ->
     userId = @getUserId()
@@ -123,7 +122,6 @@ module.exports =
       setImmediate => @reportDeprecation(deprecation)
 
   reportDeprecation: (deprecation) ->
-    packageNames = {}
     message = deprecation.getMessage()[0...500]
 
     for __, stack of deprecation.stacks
@@ -147,7 +145,6 @@ module.exports =
     callsite.fileName ? callsite.getFileName()
 
   getPackageName: (stack) ->
-    resourcePath = atom.getLoadSettings().resourcePath
     packagePaths = @getPackagePathsByPackageName()
 
     for i in [1...stack.length]
