@@ -1,11 +1,9 @@
 ## Metrics package
 [![OS X Build Status](https://travis-ci.org/atom/metrics.svg?branch=master)](https://travis-ci.org/atom/metrics) [![Windows Build Status](https://ci.appveyor.com/api/projects/status/b5doi205xl3iex04/branch/master?svg=true)](https://ci.appveyor.com/project/Atom/metrics/branch/master) [![Dependency Status](https://david-dm.org/atom/metrics.svg)](https://david-dm.org/atom/metrics)
 
-Report Atom usage metrics to the team by way of [Google Analytics][GA].
+Help improve Atom by sending usage statistics, exceptions and deprecations to the team.
 
-
-
-If you do not want this information reported, you can disable this package. Open the Settings View by running the `Settings View: Open` command from the Command Palette, go to the Packages section, and then find and disable the Metrics package.
+You will be asked at first-run whether you consent to telemetry being sent to the Atom team which includes usage statistics, sanitized exceptions and deprecation warnings. You can change your mind at a later date from the Atom Settings window.
 
 ### Collected data
 
@@ -20,6 +18,8 @@ If you do not want this information reported, you can disable this package. Open
 * Amount of time the current window took to load
 * Amount of time the app took to launch
 * Deprecated package names and versions
+
+This information is sent via [Google Analytics][GA] which allows the Atom team to analyze usage patterns and errors in order to help improve Atom.
 
 [GA]: http://www.google.com/analytics
 [RFC4122]: http://www.ietf.org/rfc/rfc4122.txt
