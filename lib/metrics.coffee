@@ -15,7 +15,8 @@ IgnoredCommands =
 module.exports =
   activate: ({sessionLength}) ->
     @subscriptions = new CompositeDisposable
-    @ensureUserInfo =>
+    @shouldIncludePanesAndCommands = Math.random() < 0.05
+    @ensureClientId =>
       @begin(sessionLength)
 
   deactivate: ->
@@ -57,7 +58,8 @@ module.exports =
       # Wait until window is fully bootstrapped before sending the load time
       Reporter.sendTiming('core', 'load', atom.getWindowLoadTime())
 
-  ensureUserInfo: (callback) ->
+  ensureClientId: (callback) ->
+    # Incorrectly previously called userId. It's actually a clientId (i.e. not across devices)
     if localStorage.getItem('metrics.userId')
       callback()
     else if atom.config.get('metrics.userId')
@@ -65,33 +67,23 @@ module.exports =
       localStorage.setItem('metrics.userId', atom.config.get('metrics.userId'))
       callback()
     else
-      @createUserId (userId) ->
-        localStorage.setItem('metrics.userId', userId)
+      @createClientId (clientId) ->
+        localStorage.setItem('metrics.userId', clientId)
         callback()
 
-  createUserId: (callback) ->
+  createClientId: (callback) ->
     callback require('node-uuid').v4()
 
-  getUserId: ->
-    userId = localStorage.getItem('metrics.userId')
-
-  shouldWatchEvents: ->
-    userId = @getUserId()
-    if userId
-      seed = 'the5%'
-      {crc32} = require 'crc'
-      checksum = crc32(userId + seed)
-      checksum % 100 < 5
-    else
-      false
+  getClientId: ->
+    localStorage.getItem('metrics.userId')
 
   watchPaneItems: ->
-    return unless @shouldWatchEvents()
+    return unless @shouldIncludePanesAndCommands
     @subscriptions.add atom.workspace.onDidAddPaneItem ({item}) ->
       Reporter.sendPaneItem(item)
 
   watchCommands: ->
-    return unless @shouldWatchEvents()
+    return unless @shouldIncludePanesAndCommands
     @subscriptions.add atom.commands.onWillDispatch (commandEvent) ->
       {type: eventName} = commandEvent
       return if commandEvent.detail?.jQueryTrigger
@@ -100,7 +92,6 @@ module.exports =
       return if eventName of IgnoredCommands
       Reporter.sendCommand(eventName)
 
-  # TODO: Remove these deprecation tracking methods after we remove 1.0 deprecations
   watchDeprecations: ->
     @deprecationCache = {}
     @packageVersionCache = {}
