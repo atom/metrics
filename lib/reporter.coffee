@@ -117,7 +117,7 @@ module.exports =
     @consentedParams: ->
       memUse = process.memoryUsage()
       {
-        cd1: startDate if startDate = localStorage.getItem('metrics.sd')
+        # cd1: was start date, removed
         cd2: getOsArch()
         cm1: memUse.heapUsed >> 20 # Convert bytes to megabytes
         cm2: Math.round((memUse.heapUsed / memUse.heapTotal) * 100)
