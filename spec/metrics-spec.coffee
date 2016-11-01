@@ -332,6 +332,7 @@ describe "Metrics", ->
     describe "when the user is NOT chosen to send events", ->
       beforeEach ->
         localStorage.setItem('metrics.userId', 'a')
+        localStorage.setItem('metrics.panesAndCommands', false)
         spyOn(Reporter, 'sendPaneItem')
 
         waitsForPromise ->
@@ -347,9 +348,10 @@ describe "Metrics", ->
         runs ->
           expect(Reporter.sendPaneItem.callCount).toBe 0
 
-    describe "when the user is NOT chosen to send events", ->
+    describe "when the user IS chosen to send events", ->
       beforeEach ->
         localStorage.setItem('metrics.userId', 'd')
+        localStorage.setItem('metrics.panesAndCommands', true)
         spyOn(Reporter, 'sendPaneItem')
 
         waitsForPromise ->
@@ -358,12 +360,12 @@ describe "Metrics", ->
         waitsFor ->
           Reporter.request.callCount > 0
 
-      it "will not report pane items", ->
+      it "will report pane items", ->
         waitsForPromise ->
           atom.workspace.open('file1.txt')
 
         runs ->
-          expect(Reporter.sendPaneItem.callCount).toBe 0
+          expect(Reporter.sendPaneItem.callCount).toBe 1
 
   describe "when deactivated", ->
     it "stops reporting pane items", ->
