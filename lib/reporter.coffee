@@ -21,11 +21,11 @@ getReleaseChannel = ->
   else
     'stable'
 
-consented = ->
-  atom.config.get('core.telemetryConsent') is 'limited'
-
 module.exports =
   class Reporter
+    @consented: ->
+      atom.config.get('core.telemetryConsent') is 'limited'
+
     @sendEvent: (category, action, label, value) ->
       params =
         t: 'event'
@@ -97,17 +97,17 @@ module.exports =
 
       @send(params)
 
-    @send: (params) ->
+    @send: (params) =>
       if navigator.onLine
         extend(params, @minimumParams)
-        extend(params, @consentedParams()) if @consented
-        @request "https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}" if @consented or @isTelemetryConsentChoice(params)
+        extend(params, @consentedParams()) if @consented()
+        @request "https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}" if @consented() or @isTelemetryConsentChoice(params)
 
     @isTelemetryConsentChoice: (params) ->
       params.t is 'event' and params.ec is 'setting' and params.ea is 'core.telemetryConsent'
 
-    @request: (params) ->
-      post("https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}")
+    @request: (url) ->
+      post(url)
 
     @consentedParams: ->
       memUse = process.memoryUsage()

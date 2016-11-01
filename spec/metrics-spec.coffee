@@ -16,7 +16,7 @@ describe "Metrics", ->
       storage[key]
 
     Reporter.commandCount = undefined
-    Reporter.consented = true
+    spyOn(Reporter, 'consented').andReturn(true)
 
   afterEach ->
     atom.packages.deactivatePackage('metrics')
