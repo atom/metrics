@@ -21,6 +21,11 @@ getReleaseChannel = ->
   else
     'stable'
 
+getOsArch = ->
+  # 32-bit node.exe's os.arch() returns 'x86' on 64-Windows
+  return 'x64' if process.os is 'win32' and process.env.PROCESSOR_ARCHITECTURE is 'AMD64'
+  return process.arch
+
 module.exports =
   class Reporter
     @consented: ->
@@ -113,6 +118,7 @@ module.exports =
       memUse = process.memoryUsage()
       {
         cd1: startDate if startDate = localStorage.getItem('metrics.sd')
+        cd2: getOsArch()
         cm1: memUse.heapUsed >> 20 # Convert bytes to megabytes
         cm2: Math.round((memUse.heapUsed / memUse.heapTotal) * 100)
         sr: "#{screen.width}x#{screen.height}"
