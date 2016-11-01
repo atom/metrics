@@ -77,13 +77,13 @@ module.exports =
     localStorage.getItem('metrics.userId')
 
   watchPaneItems: ->
-    return unless @shouldIncludePanesAndCommands
-    @subscriptions.add atom.workspace.onDidAddPaneItem ({item}) ->
+    @subscriptions.add atom.workspace.onDidAddPaneItem ({item}) =>
+      return unless @shouldIncludePanesAndCommands
       Reporter.sendPaneItem(item)
 
   watchCommands: ->
-    return unless @shouldIncludePanesAndCommands
-    @subscriptions.add atom.commands.onWillDispatch (commandEvent) ->
+    @subscriptions.add atom.commands.onWillDispatch (commandEvent) =>
+      return unless @shouldIncludePanesAndCommands
       {type: eventName} = commandEvent
       return if commandEvent.detail?.jQueryTrigger
       return if eventName.startsWith('core:') or eventName.startsWith('editor:')

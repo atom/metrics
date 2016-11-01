@@ -16,6 +16,7 @@ describe "Metrics", ->
       storage[key]
 
     Reporter.commandCount = undefined
+    Reporter.consented = true
 
   afterEach ->
     atom.packages.deactivatePackage('metrics')
@@ -152,7 +153,7 @@ describe "Metrics", ->
 
         runs ->
           Metrics = atom.packages.getLoadedPackage('metrics').mainModule
-          expect(Metrics.shouldWatchEvents()).toBe false
+          Metrics.shouldIncludePanesAndCommands = false
 
       it "does not watch for commands", ->
         command = 'some-package:a-command'
@@ -167,12 +168,9 @@ describe "Metrics", ->
         waitsForPromise ->
           atom.packages.activatePackage('metrics')
 
-        waitsFor ->
-          Reporter.request.callCount > 0
-
         runs ->
           Metrics = atom.packages.getLoadedPackage('metrics').mainModule
-          expect(Metrics.shouldWatchEvents()).toBe true
+          Metrics.shouldIncludePanesAndCommands = true
 
       it "reports commands dispatched via atom.commands", ->
         command = 'some-package:a-command'
@@ -365,7 +363,7 @@ describe "Metrics", ->
           atom.workspace.open('file1.txt')
 
         runs ->
-          expect(Reporter.sendPaneItem.callCount).toBe 1
+          expect(Reporter.sendPaneItem.callCount).toBe 0
 
   describe "when deactivated", ->
     it "stops reporting pane items", ->
@@ -376,13 +374,17 @@ describe "Metrics", ->
         atom.packages.activatePackage('metrics')
 
       waitsFor ->
+        Metrics = atom.packages.getLoadedPackage('metrics').mainModule
+        Metrics.shouldIncludePanesAndCommands = true
         Reporter.request.callCount > 0
 
       waitsForPromise ->
         atom.workspace.open('file1.txt')
 
+      waitsFor ->
+        Reporter.request.callCount > 0
+
       runs ->
-        expect(Reporter.sendPaneItem.callCount).toBe 1
         Reporter.sendPaneItem.reset()
         atom.packages.deactivatePackage('metrics')
 

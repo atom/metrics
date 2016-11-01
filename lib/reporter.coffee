@@ -100,8 +100,8 @@ module.exports =
     @send: (params) ->
       if navigator.onLine
         extend(params, @minimumParams)
-        extend(params, @consentedParams()) if consented
-        @request params if consented or @isTelemetryConsentChoice(params)
+        extend(params, @consentedParams()) if @consented
+        @request "https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}" if @consented or @isTelemetryConsentChoice(params)
 
     @isTelemetryConsentChoice: (params) ->
       params.t is 'event' and params.ec is 'setting' and params.ea is 'core.telemetryConsent'
