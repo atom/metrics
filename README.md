@@ -18,6 +18,7 @@ You will be asked at first-run whether you consent to telemetry being sent to th
 * Amount of time the current window took to load
 * Amount of time the app took to launch
 * Deprecated package names and versions
+* Chrome user-agent (version of Chrome, OS, CPU)
 
 This information is sent via [Google Analytics][GA] which allows the Atom team to analyze usage patterns and errors in order to help improve Atom.
 
