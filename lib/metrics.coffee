@@ -52,6 +52,7 @@ module.exports =
     @watchPaneItems()
     @watchCommands()
     @watchDeprecations()
+    @watchActivationTimes()
 
     if atom.getLoadSettings().shellLoadTime?
       # Only send shell load time for the first window
@@ -94,6 +95,17 @@ module.exports =
       return unless eventName.indexOf(':') > -1
       return if eventName of IgnoredCommands
       Reporter.sendCommand(eventName)
+
+  watchActivationTimes: ->
+    atom.packages.onDidActivateInitialPackages ->
+      packages = atom.packages.getLoadedPackages()
+      for pack in packages
+        continue unless pack?.name?
+        continue unless pack?.metadata?.version
+        nameAndVersion = "#{pack.name}-#{pack?.metadata?.version}"
+        activationTime = pack['activateTime']
+
+        Reporter.sendTiming('packageLoadTime', nameAndVersion, activationTime)
 
   watchDeprecations: ->
     @deprecationCache = {}
