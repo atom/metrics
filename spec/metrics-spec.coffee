@@ -39,7 +39,7 @@ describe "Metrics", ->
       Reporter.request.callCount is 3
 
     runs ->
-      [url] = Reporter.request.calls[0].argsí
+      [url] = Reporter.request.calls[0].args
       expect(url).toBeDefined()
 
   it "reports over SSL", ->
