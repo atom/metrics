@@ -39,7 +39,7 @@ describe "Metrics", ->
       Reporter.request.callCount is 3
 
     runs ->
-      [url] = Reporter.request.calls[0].args
+      [url] = Reporter.request.calls[0].argsí
       expect(url).toBeDefined()
 
   it "reports over SSL", ->
@@ -52,6 +52,19 @@ describe "Metrics", ->
     runs ->
       [url] = Reporter.request.mostRecentCall.args
       expect(url).toMatch('^https:\/\/ssl.google-analytics.com\/collect\?')
+
+  it "reports actual processor architecture", ->
+    expectedArch = if process.env.PROCESSOR_ARCHITECTURE is 'AMD64' then 'x64' else process.arch
+
+    waitsForPromise ->
+      atom.packages.activatePackage('metrics')
+
+    waitsFor ->
+      Reporter.request.callCount > 0
+
+    runs ->
+      [url] = Reporter.request.mostRecentCall.args
+      expect(url).toContain("cd2=" + expectedArch)
 
   it "specifies anonymization", ->
     waitsForPromise ->
