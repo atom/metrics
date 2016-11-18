@@ -42,7 +42,9 @@ describe "Metrics", ->
       [url] = Reporter.request.calls[0].args
       expect(url).toBeDefined()
 
-  it "reports over SSL", ->
+  it "reports only over SSL", ->
+    spyOn(Reporter, 'post')
+
     waitsForPromise ->
       atom.packages.activatePackage('metrics')
 
@@ -50,8 +52,7 @@ describe "Metrics", ->
       Reporter.request.callCount > 0
 
     runs ->
-      [url] = Reporter.request.mostRecentCall.args
-      expect(url).toMatch('^https:\/\/ssl.google-analytics.com\/collect\?')
+      expect(url).toMatch('^https:\/\/.*') for url in Reporter.post
 
   it "reports actual processor architecture", ->
     expectedArch = if process.env.PROCESSOR_ARCHITECTURE is 'AMD64' then 'x64' else process.arch

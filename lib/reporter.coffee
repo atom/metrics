@@ -1,16 +1,16 @@
 path = require 'path'
 querystring = require 'querystring'
 
+collectors = [
+  "https://ssl.google-analytics.com/collect",
+  "https://collector.github.com/collect"
+]
+
 extend = (target, propertyMaps...) ->
   for propertyMap in propertyMaps
     for key, value of propertyMap
       target[key] = value
   target
-
-post = (url) ->
-  xhr = new XMLHttpRequest()
-  xhr.open('POST', url)
-  xhr.send(null)
 
 getReleaseChannel = ->
   version = atom.getVersion()
@@ -103,16 +103,21 @@ module.exports =
       @send(params)
 
     @send: (params) =>
-      if navigator.onLine
+      if navigator.onLine and (@consented() or @isTelemetryConsentChoice(params))
         extend(params, @minimumParams)
         extend(params, @consentedParams()) if @consented()
-        @request "https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}" if @consented() or @isTelemetryConsentChoice(params)
+        @request(querystring.stringify(params))
 
     @isTelemetryConsentChoice: (params) ->
       params.t is 'event' and params.ec is 'setting' and params.ea is 'core.telemetryConsent'
 
-    @request: (url) ->
-      post(url)
+    @request: (queryString) ->
+      @post("#{baseUrl}?#{queryString}") for baseUrl in collectors
+
+    @post: (url) ->
+      xhr = new XMLHttpRequest()
+      xhr.open('POST', url)
+      xhr.send(null)
 
     @consentedParams: ->
       memUse = process.memoryUsage()
