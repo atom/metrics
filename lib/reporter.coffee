@@ -1,10 +1,14 @@
 path = require 'path'
 querystring = require 'querystring'
+https = require 'https'
+url = require 'url'
 
 collectors = [
-  "https://ssl.google-analytics.com/collect",
+  "https://www.google-analytics.com/collect",
   "https://collector.github.com/collect"
 ]
+
+queue = []
 
 extend = (target, propertyMaps...) ->
   for propertyMap in propertyMaps
@@ -28,6 +32,9 @@ getOsArch = ->
 
 module.exports =
   class Reporter
+    constructor: ->
+      @headers = {'User-Agent': navigator.userAgent}
+
     @consented: ->
       atom.config.get('core.telemetryConsent') is 'limited'
 
@@ -103,21 +110,33 @@ module.exports =
       @send(params)
 
     @send: (params) =>
-      if navigator.onLine and (@consented() or @isTelemetryConsentChoice(params))
-        extend(params, @minimumParams)
-        extend(params, @consentedParams()) if @consented()
-        @request(querystring.stringify(params))
+      if not @consented() and not @isTelemetryConsentChoice(params)
+        queue = []
+        return
+
+      extend(params, @minimumParams)
+      extend(params, @consentedParams()) if @consented()
+      queue.push(querystring.stringify(params))
+
+      @request(query) while (navigator.onLine and query = queue.shift())
+
+      queue.shift() while (not navigator.onLine and queue.length > 100)
 
     @isTelemetryConsentChoice: (params) ->
       params.t is 'event' and params.ec is 'setting' and params.ea is 'core.telemetryConsent'
 
-    @request: (queryString) ->
-      @post("#{baseUrl}?#{queryString}") for baseUrl in collectors
+    @request: (query) ->
+      @post(url.parse("#{baseUrl}?#{query}")) for baseUrl in collectors
 
-    @post: (url) ->
-      xhr = new XMLHttpRequest()
-      xhr.open('POST', url)
-      xhr.send(null)
+    @post: (requestUrl) ->
+      https
+        .get({
+          host: requestUrl.host,
+          path: requestUrl.path,
+          headers: @headers,
+          timeout: 5000
+          }, (r) ->)
+        .on 'error', (f) -> # Avoid console exceptions if down or blocked
 
     @consentedParams: ->
       memUse = process.memoryUsage()
