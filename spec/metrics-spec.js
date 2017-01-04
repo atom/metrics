@@ -4,9 +4,9 @@ import $ from 'jquery'
 import Reporter from '../lib/reporter'
 import grim from 'grim'
 
-describe("Metrics", function() {
+describe("Metrics", () => {
   let workspaceElement = []
-  beforeEach(function() {
+  beforeEach(() => {
     workspaceElement = atom.views.getView(atom.workspace)
 
     spyOn(Reporter, 'request')
@@ -21,12 +21,12 @@ describe("Metrics", function() {
 
   afterEach(() => atom.packages.deactivatePackage('metrics'))
 
-  it("reports events", function() {
+  it("reports events", () => {
     waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
     waitsFor(() => Reporter.request.callCount === 2)
 
-    runs(function() {
+    runs(() => {
       Reporter.request.reset()
       return atom.packages.deactivatePackage('metrics')
     })
@@ -35,13 +35,13 @@ describe("Metrics", function() {
 
     waitsFor(() => Reporter.request.callCount === 3)
 
-    return runs(function() {
+    return runs(() => {
       let url = Reporter.request.calls[0].args[0]
       return expect(url).toBeDefined()
     })
   })
 
-  it("reports over SSL", function() {
+  it("reports over SSL",() => {
     waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
     waitsFor(() => Reporter.request.callCount > 0)
@@ -52,7 +52,7 @@ describe("Metrics", function() {
     })
   })
 
-  it("reports actual processor architecture", function() {
+  it("reports actual processor architecture",() => {
     let expectedArch = process.env.PROCESSOR_ARCHITECTURE === 'AMD64' ? 'x64' : process.arch
 
     waitsForPromise(() => atom.packages.activatePackage('metrics'))
@@ -65,7 +65,7 @@ describe("Metrics", function() {
     })
   })
 
-  it("specifies anonymization", function() {
+  it("specifies anonymization",() => {
     waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
     waitsFor(() => Reporter.request.callCount > 0)
@@ -76,7 +76,7 @@ describe("Metrics", function() {
     })
   })
 
-  it("specifies screen resolution", function() {
+  it("specifies screen resolution",() => {
     waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
     waitsFor(() => Reporter.request.callCount > 0)
@@ -87,7 +87,7 @@ describe("Metrics", function() {
     })
   })
 
-  it("specifies window resolution", function() {
+  it("specifies window resolution",() => {
     waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
     waitsFor(() => Reporter.request.callCount > 0)
@@ -98,7 +98,7 @@ describe("Metrics", function() {
     })
   })
 
-  it("specifies heap usage in MB and %", function() {
+  it("specifies heap usage in MB and %",() => {
     spyOn(process, 'memoryUsage').andReturn({heapTotal: 234567890, heapUsed: 123456789})
 
     waitsForPromise(() => atom.packages.activatePackage('metrics'))
@@ -112,10 +112,10 @@ describe("Metrics", function() {
     })
   })
 
-  describe("reporting release channel", function() {
+  describe("reporting release channel",() => {
     beforeEach(() => localStorage.setItem('metrics.userId', 'a'))
 
-    it("reports the dev release channel", function() {
+    it("reports the dev release channel",() => {
       spyOn(atom, 'getVersion').andReturn('1.0.2-dev-dedbeef')
       waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
@@ -127,7 +127,7 @@ describe("Metrics", function() {
       })
     })
 
-    it("reports the beta release channel", function() {
+    it("reports the beta release channel",() => {
       spyOn(atom, 'getVersion').andReturn('1.0.2-beta1')
       waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
@@ -139,7 +139,7 @@ describe("Metrics", function() {
       })
     })
 
-    return it("reports the stable release channel", function() {
+    return it("reports the stable release channel",() => {
       spyOn(atom, 'getVersion').andReturn('1.0.2')
       waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
@@ -152,8 +152,8 @@ describe("Metrics", function() {
     })
   })
 
-  describe("reporting commands", function() {
-    describe("when the user is NOT chosen to send commands", function() {
+  describe("reporting commands",() => {
+    describe("when the user is NOT chosen to send commands",() => {
       beforeEach(function() {
         localStorage.setItem('metrics.userId', 'a')
 
@@ -167,7 +167,7 @@ describe("Metrics", function() {
         })
       })
 
-      return it("does not watch for commands", function() {
+      return it("does not watch for commands",() => {
         let command = 'some-package:a-command'
 
         atom.commands.dispatch(workspaceElement, command, null)
@@ -175,7 +175,7 @@ describe("Metrics", function() {
       })
     })
 
-    return describe("when the user is chosen to send commands", function() {
+    return describe("when the user is chosen to send commands",() => {
       beforeEach(function() {
         localStorage.setItem('metrics.userId', 'd')
 
@@ -187,7 +187,7 @@ describe("Metrics", function() {
         })
       })
 
-      it("reports commands dispatched via atom.commands", function() {
+      it("reports commands dispatched via atom.commands",() => {
         let command = 'some-package:a-command'
 
         atom.commands.dispatch(workspaceElement, command, null)
@@ -206,7 +206,7 @@ describe("Metrics", function() {
         return expect(url).toContain("ev=2")
       })
 
-      it("does not report editor: and core: commands", function() {
+      it("does not report editor: and core: commands",() => {
         Reporter.request.reset()
         atom.commands.dispatch(workspaceElement, 'core:move-up', null)
         expect(Reporter.request).not.toHaveBeenCalled()
@@ -215,13 +215,13 @@ describe("Metrics", function() {
         return expect(Reporter.request).not.toHaveBeenCalled()
       })
 
-      it("does not report non-namespaced commands", function() {
+      it("does not report non-namespaced commands",() => {
         Reporter.request.reset()
         atom.commands.dispatch(workspaceElement, 'dragover', null)
         return expect(Reporter.request).not.toHaveBeenCalled()
       })
 
-      it("does not report vim-mode:* movement commands", function() {
+      it("does not report vim-mode:* movement commands",() => {
         Reporter.request.reset()
         atom.commands.dispatch(workspaceElement, 'vim-mode:move-up', null)
         atom.commands.dispatch(workspaceElement, 'vim-mode:move-down', null)
@@ -230,7 +230,7 @@ describe("Metrics", function() {
         return expect(Reporter.request).not.toHaveBeenCalled()
       })
 
-      return it("does not report commands triggered via jquery", function() {
+      return it("does not report commands triggered via jquery",() => {
         Reporter.request.reset()
         $(workspaceElement).trigger('some-package:a-command')
         return expect(Reporter.request).not.toHaveBeenCalled()
@@ -238,7 +238,7 @@ describe("Metrics", function() {
     })
   })
 
-  describe("reporting exceptions", function() {
+  describe("reporting exceptions",() => {
     beforeEach(function() {
       spyOn(atom, 'openDevTools').andReturn(Promise.resolve())
       spyOn(atom, 'executeJavaScriptInDevTools')
@@ -247,7 +247,7 @@ describe("Metrics", function() {
       return waitsFor(() => Reporter.request.callCount > 0)
     })
 
-    it("reports an exception with the correct type", function() {
+    it("reports an exception with the correct type",() => {
       let message = "Uncaught TypeError: Cannot call method 'getScreenRow' of undefined"
       window.onerror(message, 'abc', 2, 3, {ok: true})
 
@@ -257,7 +257,7 @@ describe("Metrics", function() {
     })
 
     describe("when the message has no clear type", () =>
-      it("reports an exception with the correct type", function() {
+      it("reports an exception with the correct type",() => {
         let message = ""
         window.onerror(message, 2, 3, {ok: true})
 
@@ -267,29 +267,29 @@ describe("Metrics", function() {
       })
     )
 
-    return describe("when there are paths in the exception", function() {
-      it("strips unix paths surrounded in quotes", function() {
+    return describe("when there are paths in the exception",() => {
+      it("strips unix paths surrounded in quotes",() => {
         let message = "Error: ENOENT, unlink '/Users/someguy/path/file.js'"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         return expect(decodeURIComponent(url)).toContain("exd=Error: ENOENT, unlink <path>")
       })
 
-      it("strips unix paths without quotes", function() {
+      it("strips unix paths without quotes",() => {
         let message = "Uncaught Error: spawn /Users/someguy.omg/path/file-09238_ABC-Final-Final.js ENOENT"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         return expect(decodeURIComponent(url)).toContain("exd=Error: spawn <path> ENOENT")
       })
 
-      it("strips windows paths without quotes", function() {
+      it("strips windows paths without quotes",() => {
         let message = "Uncaught Error: spawn c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         return expect(decodeURIComponent(url)).toContain("exd=Error: spawn <path> ENOENT")
       })
 
-      return it("strips windows paths surrounded in quotes", function() {
+      return it("strips windows paths surrounded in quotes",() => {
         let message = "Uncaught Error: EACCES 'c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
@@ -298,14 +298,14 @@ describe("Metrics", function() {
     })
   })
 
-  describe("reporting deprecations", function() {
+  describe("reporting deprecations",() => {
     beforeEach(function() {
       waitsForPromise(() => atom.packages.activatePackage('metrics'))
 
       return waitsFor(() => Reporter.request.callCount > 0)
     })
 
-    it("reports a deprecation with metadata specified", function() {
+    it("reports a deprecation with metadata specified",() => {
       Reporter.request.reset()
       jasmine.snapshotDeprecations()
       grim.deprecate('bad things are bad', {packageName: 'somepackage'})
@@ -322,7 +322,7 @@ describe("Metrics", function() {
       })
     })
 
-    return it("reports a deprecation without metadata specified", function() {
+    return it("reports a deprecation without metadata specified",() => {
       Reporter.request.reset()
       jasmine.snapshotDeprecations()
 
@@ -361,8 +361,8 @@ describe("Metrics", function() {
     })
   })
 
-  describe("reporting pane items", function() {
-    describe("when the user is NOT chosen to send events", function() {
+  describe("reporting pane items",() => {
+    describe("when the user is NOT chosen to send events",() => {
       beforeEach(function() {
         localStorage.setItem('metrics.userId', 'a')
         localStorage.setItem('metrics.panesAndCommands', false)
@@ -373,14 +373,14 @@ describe("Metrics", function() {
         return waitsFor(() => Reporter.request.callCount > 0)
       })
 
-      return it("will not report pane items", function() {
+      return it("will not report pane items",() => {
         waitsForPromise(() => atom.workspace.open('file1.txt'))
 
         return runs(() => expect(Reporter.sendPaneItem.callCount).toBe(0))
       })
     })
 
-    return describe("when the user IS chosen to send events", function() {
+    return describe("when the user IS chosen to send events",() => {
       beforeEach(function() {
         localStorage.setItem('metrics.userId', 'd')
         localStorage.setItem('metrics.panesAndCommands', true)
@@ -391,7 +391,7 @@ describe("Metrics", function() {
         return waitsFor(() => Reporter.request.callCount > 0)
       })
 
-      return it("will report pane items", function() {
+      return it("will report pane items",() => {
         waitsForPromise(() => atom.workspace.open('file1.txt'))
 
         return runs(() => expect(Reporter.sendPaneItem.callCount).toBe(1))
@@ -400,7 +400,7 @@ describe("Metrics", function() {
   })
 
   describe("when deactivated", () =>
-    it("stops reporting pane items", function() {
+    it("stops reporting pane items",() => {
       localStorage.setItem('metrics.userId', 'd')
       spyOn(Reporter, 'sendPaneItem')
 
@@ -427,7 +427,7 @@ describe("Metrics", function() {
     })
   )
 
-  return describe("the metrics-reporter service", function() {
+  return describe("the metrics-reporter service",() => {
     let reporterService = null
     beforeEach(function() {
       waitsForPromise(() =>
@@ -440,21 +440,21 @@ describe("Metrics", function() {
     })
 
     describe("::sendEvent", () =>
-      it("makes a request", function() {
+      it("makes a request",() => {
         reporterService.sendEvent('cat', 'action', 'label')
         return expect(Reporter.request).toHaveBeenCalled()
       })
     )
 
     describe("::sendTiming", () =>
-      it("makes a request", function() {
+      it("makes a request",() => {
         reporterService.sendEvent('cat', 'name')
         return expect(Reporter.request).toHaveBeenCalled()
       })
     )
 
     return describe("::sendException", () =>
-      it("makes a request", function() {
+      it("makes a request",() => {
         reporterService.sendException('desc')
         return expect(Reporter.request).toHaveBeenCalled()
       })
