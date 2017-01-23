@@ -62,7 +62,7 @@ module.exports =
       name = item.getViewClass?().name ? item.constructor.name
       itemPath = item.getPath?()
 
-      return name unless path.dirname(itemPath) is atom.getConfigDirPath()
+      return name unless itemPath? and path.dirname(itemPath) is atom.getConfigDirPath()
 
       extension = path.extname(itemPath)
       switch path.basename(itemPath, extension)
