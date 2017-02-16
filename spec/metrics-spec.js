@@ -129,8 +129,8 @@ describe("Metrics", async () => {
         await atom.packages.activatePackage('metrics')
         await conditionPromise(() => Reporter.request.callCount > 0)
 
-        let Metrics = atom.packages.getLoadedPackage('metrics').mainModule
-        Metrics.shouldIncludePanesAndCommands = false
+        const {mainModule} = atom.packages.getLoadedPackage('metrics')
+        mainModule.shouldIncludePanesAndCommands = false
       })
 
       it("does not watch for commands", async () => {
@@ -144,12 +144,10 @@ describe("Metrics", async () => {
     describe("when the user is chosen to send commands", async () => {
       beforeEach(async () => {
         localStorage.setItem('metrics.userId', 'd')
-        spyOn(Reporter, 'shouldReportPanesAndCommands').andReturn(true)
-
         await atom.packages.activatePackage('metrics')
 
-        let Metrics = atom.packages.getLoadedPackage('metrics').mainModule
-        Metrics.shouldIncludePanesAndCommands = true
+        const {mainModule} = atom.packages.getLoadedPackage('metrics')
+        mainModule.shouldIncludePanesAndCommands = true
       })
 
       it("reports commands dispatched via atom.commands", () => {
@@ -324,10 +322,10 @@ describe("Metrics", async () => {
     describe("when the user is NOT chosen to send events", async () => {
       beforeEach(async () => {
         localStorage.setItem('metrics.userId', 'a')
-        spyOn(Reporter, 'shouldReportPanesAndCommands').andReturn(false)
         spyOn(Reporter, 'sendPaneItem')
 
-        await atom.packages.activatePackage('metrics')
+        const {mainModule} = await atom.packages.activatePackage('metrics')
+        mainModule.shouldIncludePanesAndCommands = false
 
         await conditionPromise(() => Reporter.request.callCount > 0)
       })
@@ -342,10 +340,11 @@ describe("Metrics", async () => {
     describe("when the user IS chosen to send events", async () => {
       beforeEach(async () => {
         localStorage.setItem('metrics.userId', 'd')
-        spyOn(Reporter, 'shouldReportPanesAndCommands').andReturn(true)
         spyOn(Reporter, 'sendPaneItem')
 
-        await atom.packages.activatePackage('metrics')
+        const {mainModule} = await atom.packages.activatePackage('metrics')
+        mainModule.shouldIncludePanesAndCommands = true
+
         await conditionPromise(() => Reporter.request.callCount > 0)
       })
 
@@ -362,10 +361,8 @@ describe("Metrics", async () => {
       localStorage.setItem('metrics.userId', 'd')
       spyOn(Reporter, 'sendPaneItem')
 
-      await atom.packages.activatePackage('metrics')
-
-      let Metrics = atom.packages.getLoadedPackage('metrics').mainModule
-      Metrics.shouldIncludePanesAndCommands = true
+      const {mainModule} = await atom.packages.activatePackage('metrics')
+      mainModule.shouldIncludePanesAndCommands = true
       await conditionPromise(() => Reporter.request.callCount > 0)
 
       await atom.workspace.open('file1.txt')

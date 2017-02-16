@@ -14,7 +14,7 @@ IgnoredCommands =
 module.exports =
   activate: ({sessionLength}) ->
     @subscriptions = new CompositeDisposable
-    @shouldIncludePanesAndCommands = Reporter.shouldReportPanesAndCommands()
+    @shouldIncludePanesAndCommands = Math.random() < 0.05
     @ensureClientId => @begin(sessionLength)
 
   deactivate: ->
