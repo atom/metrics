@@ -144,6 +144,7 @@ describe("Metrics", async () => {
     describe("when the user is chosen to send commands", async () => {
       beforeEach(async () => {
         localStorage.setItem('metrics.userId', 'd')
+        spyOn(Reporter, 'shouldReportPanesAndCommands').andReturn(true)
 
         await atom.packages.activatePackage('metrics')
 
@@ -323,7 +324,7 @@ describe("Metrics", async () => {
     describe("when the user is NOT chosen to send events", async () => {
       beforeEach(async () => {
         localStorage.setItem('metrics.userId', 'a')
-        localStorage.setItem('metrics.panesAndCommands', false)
+        spyOn(Reporter, 'shouldReportPanesAndCommands').andReturn(false)
         spyOn(Reporter, 'sendPaneItem')
 
         await atom.packages.activatePackage('metrics')
@@ -341,7 +342,7 @@ describe("Metrics", async () => {
     describe("when the user IS chosen to send events", async () => {
       beforeEach(async () => {
         localStorage.setItem('metrics.userId', 'd')
-        localStorage.setItem('metrics.panesAndCommands', true)
+        spyOn(Reporter, 'shouldReportPanesAndCommands').andReturn(true)
         spyOn(Reporter, 'sendPaneItem')
 
         await atom.packages.activatePackage('metrics')

@@ -28,6 +28,8 @@ getOsArch = ->
 
 module.exports =
   class Reporter
+    @shouldReportPanesAndCommands: -> Math.random() < 0.05
+
     @consented: ->
       atom.config.get('core.telemetryConsent') is 'limited'
 
