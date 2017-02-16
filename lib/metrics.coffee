@@ -14,13 +14,8 @@ IgnoredCommands =
 module.exports =
   activate: ({sessionLength}) ->
     @subscriptions = new CompositeDisposable
-    overridePanesAndCommands = localStorage.getItem('metrics.panesAndCommands')
-    if (overridePanesAndCommands)
-      @shouldIncludePanesAndCommands = overridePanesAndCommands
-    else
-      @shouldIncludePanesAndCommands = Math.random() < 0.05
-    @ensureClientId =>
-      @begin(sessionLength)
+    @shouldIncludePanesAndCommands = Math.random() < 0.05
+    @ensureClientId => @begin(sessionLength)
 
   deactivate: ->
     @subscriptions?.dispose()
