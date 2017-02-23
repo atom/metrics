@@ -104,7 +104,14 @@ module.exports =
 
     @send: (params) =>
       if navigator.onLine
-        extend(params, @minimumParams)
+        extend(params, {
+          v: 1
+          aip: 1
+          tid: 'UA-3769691-33'
+          cid: localStorage.getItem('metrics.userId')
+          an: 'atom'
+          av: atom.getVersion()
+        })
         extend(params, @consentedParams()) if @consented()
         @request "https://ssl.google-analytics.com/collect?#{querystring.stringify(params)}" if @consented() or @isTelemetryConsentChoice(params)
 
@@ -124,14 +131,4 @@ module.exports =
         sr: "#{screen.width}x#{screen.height}"
         vp: "#{innerWidth}x#{innerHeight}"
         aiid: getReleaseChannel()
-      }
-
-    @minimumParams =
-      {
-        v: 1
-        aip: 1
-        tid: 'UA-3769691-33'
-        cid: localStorage.getItem('metrics.userId')
-        an: 'atom'
-        av: atom.getVersion()
       }
