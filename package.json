@@ -16,7 +16,7 @@
     }
   },
   "dependencies": {
-    "fs-plus": "^2.8.0",
+    "fs-plus": "^3.0.0",
     "grim": "^2.0.1",
     "node-uuid": "~1.4.7"
   },
