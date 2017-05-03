@@ -23,7 +23,7 @@ getReleaseChannel = ->
 
 getOsArch = ->
   # 32-bit node.exe's os.arch() returns 'x86' on 64-Windows
-  return 'x64' if process.platform is 'win32' and process.env.PROCESSOR_ARCHITECTURE is 'AMD64'
+  return 'x64' if process.platform is 'win32' and process.env.PROCESSOR_ARCHITEW6432 is 'AMD64'
   return process.arch
 
 module.exports =
@@ -126,6 +126,7 @@ module.exports =
       {
         # cd1: was start date, removed
         cd2: getOsArch()
+        cd3: process.arch
         cm1: memUse.heapUsed >> 20 # Convert bytes to megabytes
         cm2: Math.round((memUse.heapUsed / memUse.heapTotal) * 100)
         sr: "#{screen.width}x#{screen.height}"
