@@ -23,6 +23,7 @@ describe("Metrics", async () => {
   afterEach(async () => await atom.packages.deactivatePackage('metrics'))
 
   it("reports events", async () => {
+    jasmine.useRealClock()
     await atom.packages.activatePackage('metrics')
     await conditionPromise(() => Reporter.request.callCount === 2)
 
