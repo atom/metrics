@@ -1,7 +1,6 @@
 /** @babel */
 
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers'
-import $ from 'jquery'
 import Reporter from '../lib/reporter'
 import grim from 'grim'
 
@@ -196,7 +195,7 @@ describe("Metrics", async () => {
 
       it("does not report commands triggered via jquery", () => {
         Reporter.request.reset()
-        $(workspaceElement).trigger('some-package:a-command')
+        atom.commands.dispatch(workspaceElement, 'some-package:a-command', {jQueryTrigger: 'trigger'})
         expect(Reporter.request).not.toHaveBeenCalled()
       })
     })
