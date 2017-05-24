@@ -1,6 +1,8 @@
 version: "{build}"
 
-platform: x64
+platform:
+  - x64
+  - x86
 
 branches:
     only:

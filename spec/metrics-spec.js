@@ -44,7 +44,7 @@ describe("Metrics", async () => {
   })
 
   it("reports actual processor architecture", async () => {
-    let expectedArch = process.env.PROCESSOR_ARCHITECTURE === 'AMD64' ? 'x64' : process.arch
+    let expectedArch = process.env.PROCESSOR_ARCHITEW6432 === 'AMD64' ? 'x64' : process.arch
 
     await atom.packages.activatePackage('metrics')
     await conditionPromise(() => Reporter.request.callCount > 0)
