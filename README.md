@@ -13,7 +13,8 @@ You will be asked at first-run whether you consent to telemetry being sent to th
 * Name of each Atom view class or Atom configuration file opened in a pane, e.g. `EditorView`, `SettingsView`, `MarkdownPreviewView`, and `UserKeymap`. **No other pane item information is collected.**
 * Exception messages (without paths)
 * Heap memory used as MB and %
-* Commands run (save core commands)
+* Commands run (except core commands)
+* File open events and the language scope of the file opened
 * Amount of time the current window was open for
 * Amount of time the current window took to load
 * Amount of time the app took to launch
