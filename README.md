@@ -14,7 +14,7 @@ You will be asked at first-run whether you consent to telemetry being sent to th
 * Exception messages (without paths)
 * Heap memory used as MB and %
 * Commands run (except core commands)
-* File open events and the language scope of the file opened
+* File open events and their language grammar scope names
 * Amount of time the current window was open for
 * Amount of time the current window took to load
 * Amount of time the app took to launch
