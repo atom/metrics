@@ -41,6 +41,10 @@ module.exports =
       errorMessage = errorMessage.replace('Uncaught ', '').slice(0, 150)
       Reporter.sendException(errorMessage)
 
+    @subscriptions.add atom.textEditors.observe (editor) ->
+      grammar = editor.getGrammar()
+      Reporter.sendEvent 'file', 'open', grammar.scopeName if grammar
+
     @subscriptions.add atom.config.onDidChange 'core.telemetryConsent', ({newValue, oldValue}) ->
       Reporter.sendEvent 'setting', 'core.telemetryConsent', newValue unless newValue is 'undecided'
 
