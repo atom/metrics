@@ -1,7 +1,7 @@
 {
   "name": "metrics",
   "main": "./lib/metrics",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "Help improve Atom by sending usage statistics, exceptions and deprecations to the team",
   "repository": "https://github.com/atom/metrics",
   "license": "MIT",
