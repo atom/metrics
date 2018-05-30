@@ -40,7 +40,7 @@ describe('Metrics', async () => {
     await conditionPromise(() => Reporter.request.callCount > 0)
 
     let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toMatch('^https:\/\/ssl.google-analytics.com\/collect\?')
+    expect(url).toMatch(/^https:\/\/ssl.google-analytics.com\/collect\?/)
   })
 
   it('reports actual processor architecture', async () => {
