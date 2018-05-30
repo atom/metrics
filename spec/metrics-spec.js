@@ -313,7 +313,7 @@ describe('Metrics', async () => {
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('t=event')
       expect(url).toContain('ec=deprecation')
-      expect(url).toMatch('ea=metrics%40[0-9]+\.[0-9]+\.[0-9]+')
+      expect(url).toMatch(/ea=metrics%40[0-9]+\.[0-9]+\.[0-9]+/)
       expect(url).toContain('el=bad%20things%20are%20bad')
     })
   })
