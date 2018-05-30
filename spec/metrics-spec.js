@@ -12,7 +12,7 @@ describe('Metrics', async () => {
     spyOn(Reporter, 'request')
 
     let storage = {}
-    spyOn(global.localStorage, 'setItem').andCallFake((key, value) => storage[key] = value)
+    spyOn(global.localStorage, 'setItem').andCallFake((key, value) => { storage[key] = value })
     spyOn(global.localStorage, 'getItem').andCallFake(key => storage[key])
 
     Reporter.commandCount = undefined
