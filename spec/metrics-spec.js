@@ -19,7 +19,7 @@ describe('Metrics', async () => {
     spyOn(Reporter, 'consented').andReturn(true)
   })
 
-  afterEach(async () => await atom.packages.deactivatePackage('metrics'))
+  afterEach(async () => atom.packages.deactivatePackage('metrics'))
 
   it('reports events', async () => {
     jasmine.useRealClock()
