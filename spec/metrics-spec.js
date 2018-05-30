@@ -379,7 +379,9 @@ describe('Metrics', async () => {
   describe('the metrics-reporter service', async () => {
     let reporterService = null
     beforeEach(async () => {
-      await atom.packages.activatePackage('metrics').then(pack => reporterService = pack.mainModule.provideReporter())
+      await atom.packages.activatePackage('metrics').then(pack => {
+        reporterService = pack.mainModule.provideReporter()
+      })
       await conditionPromise(() => Reporter.request.callCount > 0)
       Reporter.request.reset()
     })
