@@ -25,7 +25,8 @@
   },
   "standard": {
     "globals": [
-      "atom"
+      "atom",
+      "XMLHttpRequest"
     ],
     "env": {
       "jasmine": true
