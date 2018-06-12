@@ -21,6 +21,21 @@
     "node-uuid": "~1.4.7"
   },
   "devDependencies": {
-    "coffeelint": "^1.9.7"
+    "standard": "*"
+  },
+  "standard": {
+    "env": [
+      "browser",
+      "node",
+      "atomtest",
+      "jasmine"
+    ],
+    "globals": [
+      "atom"
+    ]
+  },
+  "scripts": {
+    "lint": "standard --verbose",
+    "test": "npm run lint && apm test"
   }
 }
