@@ -24,13 +24,15 @@
     "standard": "*"
   },
   "standard": {
-    "globals": [
-      "atom",
-      "XMLHttpRequest"
+    "env": [
+      "browser",
+      "node",
+      "atomtest",
+      "jasmine"
     ],
-    "env": {
-      "jasmine": true
-    }
+    "globals": [
+      "atom"
+    ]
   },
   "scripts": {
     "lint": "standard --verbose",
