@@ -340,7 +340,6 @@ describe('Metrics', async () => {
     describe('when the user IS chosen to send events', async () => {
       beforeEach(async () => {
         global.localStorage.setItem('metrics.userId', 'd')
-        spyOn(Reporter, 'sendPaneItem')
 
         const {mainModule} = await atom.packages.activatePackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true
@@ -350,8 +349,11 @@ describe('Metrics', async () => {
 
       it('will report pane items', async () => {
         await atom.workspace.open('file1.txt')
-
-        expect(Reporter.sendPaneItem.callCount).toBe(1)
+        const paneItemCalls = Reporter.request.calls.filter((call) => {
+          const url = call.args[0]
+          return url.includes('t=appview') && url.includes('cd=TextEditor')
+        })
+        expect(paneItemCalls.length).toBe(1)
       })
     })
   })
