@@ -321,7 +321,6 @@ describe('Metrics', async () => {
   describe('reporting pane items', async () => {
     describe('when the user is NOT chosen to send events', async () => {
       beforeEach(async () => {
-        global.localStorage.setItem('metrics.userId', 'a')
         spyOn(Reporter, 'sendPaneItem')
 
         const {mainModule} = await atom.packages.activatePackage('metrics')
@@ -339,8 +338,6 @@ describe('Metrics', async () => {
 
     describe('when the user IS chosen to send events', async () => {
       beforeEach(async () => {
-        global.localStorage.setItem('metrics.userId', 'd')
-
         const {mainModule} = await atom.packages.activatePackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true
 
