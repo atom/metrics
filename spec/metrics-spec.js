@@ -372,10 +372,10 @@ describe('Metrics', async () => {
         await conditionPromise(() => {
           return Reporter.request.calls.find((call) => {
             const url = call.args[0]
-            return url.includes('t=event')
-              && url.includes('ec=package')
-              && url.includes('ea=numberOptionalPackagesActivatedAtStartup')
-              && url.includes('ev=1')
+            return url.includes('t=event') &&
+              url.includes('ec=package') &&
+              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
+              url.includes('ev=1')
           })
         })
       })
@@ -394,10 +394,10 @@ describe('Metrics', async () => {
         await conditionPromise(() => {
           return Reporter.request.calls.find((call) => {
             const url = call.args[0]
-            return url.includes('t=event')
-              && url.includes('ec=package')
-              && url.includes('ea=numberOptionalPackagesActivatedAtStartup')
-              && url.includes('ev=0')
+            return url.includes('t=event') &&
+              url.includes('ec=package') &&
+              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
+              url.includes('ev=0')
           })
         })
       })
