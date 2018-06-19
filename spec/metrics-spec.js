@@ -355,6 +355,55 @@ describe('Metrics', async () => {
     })
   })
 
+  describe('reporting activation of optional packages', async () => {
+    describe('when optional packages are present', () => {
+      it('reports the number of optional packages activated at startup', async () => {
+        await atom.packages.activatePackage('metrics')
+        expect(atom.packages.isBundledPackage('metrics')).toBe(true)
+
+        await atom.packages.activatePackage('example')
+        expect(atom.packages.isBundledPackage('example')).toBe(false)
+
+        // Mimic the event that is emitted when Atom finishes loading all
+        // packages at startup. (We don't want to weigh down this test with the
+        // overhead of actually load _all_ packages.)
+        atom.packages.emitter.emit('did-activate-initial-packages')
+
+        await conditionPromise(() => {
+          return Reporter.request.calls.find((call) => {
+            const url = call.args[0]
+            return url.includes('t=event')
+              && url.includes('ec=package')
+              && url.includes('ea=numberOptionalPackagesActivatedAtStartup')
+              && url.includes('ev=1')
+          })
+        })
+      })
+    })
+
+    describe('when only bundled packages are present', () => {
+      it('reports a quantity of zero when the user has no optional packages enabled', async () => {
+        await atom.packages.activatePackage('metrics')
+        expect(atom.packages.isBundledPackage('metrics')).toBe(true)
+
+        // Mimic the event that is emitted when Atom finishes loading all
+        // packages at startup. (We don't want to weigh down this test with the
+        // overhead of actually load _all_ packages.)
+        atom.packages.emitter.emit('did-activate-initial-packages')
+
+        await conditionPromise(() => {
+          return Reporter.request.calls.find((call) => {
+            const url = call.args[0]
+            return url.includes('t=event')
+              && url.includes('ec=package')
+              && url.includes('ea=numberOptionalPackagesActivatedAtStartup')
+              && url.includes('ev=0')
+          })
+        })
+      })
+    })
+  })
+
   describe('when deactivated', async () =>
     it('stops reporting pane items', async () => {
       global.localStorage.setItem('metrics.userId', 'd')
