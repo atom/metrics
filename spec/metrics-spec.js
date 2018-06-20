@@ -3,6 +3,7 @@
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers' // eslint-disable-line no-unused-vars
 import Reporter from '../lib/reporter'
 import grim from 'grim'
+import path from 'path'
 
 describe('Metrics', async () => {
   let workspaceElement = []
@@ -357,6 +358,13 @@ describe('Metrics', async () => {
 
   describe('reporting activation of optional packages', async () => {
     describe('when optional packages are present', () => {
+      let originalPackageDirPaths = atom.packages.packageDirPaths
+
+      beforeEach(() => {
+        const packageFixturePath = path.join(__dirname, 'fixtures', 'packages')
+        atom.packages.packageDirPaths.push(packageFixturePath)
+      })
+
       it('reports the number of optional packages activated at startup', async () => {
         await atom.packages.activatePackage('metrics')
         expect(atom.packages.isBundledPackage('metrics')).toBe(true)
@@ -378,6 +386,10 @@ describe('Metrics', async () => {
               url.includes('ev=1')
           })
         })
+      })
+
+      afterEach(() => {
+        atom.packages.packageDirPaths = originalPackageDirPaths
       })
     })
 
