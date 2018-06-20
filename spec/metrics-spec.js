@@ -3,6 +3,7 @@
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers' // eslint-disable-line no-unused-vars
 import Reporter from '../lib/reporter'
 import grim from 'grim'
+import path from 'path'
 
 describe('Metrics', async () => {
   let workspaceElement = []
@@ -351,6 +352,66 @@ describe('Metrics', async () => {
           return url.includes('t=appview') && url.includes('cd=TextEditor')
         })
         expect(paneItemCalls.length).toBe(1)
+      })
+    })
+  })
+
+  describe('reporting activation of optional packages', async () => {
+    describe('when optional packages are present', () => {
+      let originalPackageDirPaths = atom.packages.packageDirPaths
+
+      beforeEach(() => {
+        const packageFixturePath = path.join(__dirname, 'fixtures', 'packages')
+        atom.packages.packageDirPaths.push(packageFixturePath)
+      })
+
+      it('reports the number of optional packages activated at startup', async () => {
+        await atom.packages.activatePackage('metrics')
+        expect(atom.packages.isBundledPackage('metrics')).toBe(true)
+
+        await atom.packages.activatePackage('example')
+        expect(atom.packages.isBundledPackage('example')).toBe(false)
+
+        // Mimic the event that is emitted when Atom finishes loading all
+        // packages at startup. (We don't want to weigh down this test with the
+        // overhead of actually load _all_ packages.)
+        atom.packages.emitter.emit('did-activate-initial-packages')
+
+        await conditionPromise(() => {
+          return Reporter.request.calls.find((call) => {
+            const url = call.args[0]
+            return url.includes('t=event') &&
+              url.includes('ec=package') &&
+              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
+              url.includes('ev=1')
+          })
+        })
+      })
+
+      afterEach(() => {
+        atom.packages.packageDirPaths = originalPackageDirPaths
+      })
+    })
+
+    describe('when only bundled packages are present', () => {
+      it('reports a quantity of zero when the user has no optional packages enabled', async () => {
+        await atom.packages.activatePackage('metrics')
+        expect(atom.packages.isBundledPackage('metrics')).toBe(true)
+
+        // Mimic the event that is emitted when Atom finishes loading all
+        // packages at startup. (We don't want to weigh down this test with the
+        // overhead of actually load _all_ packages.)
+        atom.packages.emitter.emit('did-activate-initial-packages')
+
+        await conditionPromise(() => {
+          return Reporter.request.calls.find((call) => {
+            const url = call.args[0]
+            return url.includes('t=event') &&
+              url.includes('ec=package') &&
+              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
+              url.includes('ev=0')
+          })
+        })
       })
     })
   })
