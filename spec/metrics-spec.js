@@ -167,7 +167,7 @@ describe('Metrics', async () => {
   })
 
   describe('reporting commands', async () => {
-    describe('when the user is NOT chosen to send commands', async () => {
+    describe('when the user has NOT chosen to send commands', async () => {
       beforeEach(async () => {
         global.localStorage.setItem('metrics.userId', 'a')
         await atom.packages.activatePackage('metrics')
@@ -313,7 +313,8 @@ describe('Metrics', async () => {
     it('reports a deprecation with metadata specified', async () => {
       Reporter.request.reset()
       jasmine.snapshotDeprecations()
-      grim.deprecate('bad things are bad', {packageName: 'somepackage'})
+      const deprecationMessage = 'bad things are bad'
+      grim.deprecate(deprecationMessage, {packageName: 'somepackage'})
       jasmine.restoreDeprecationsSnapshot()
 
       await conditionPromise(() => Reporter.request.callCount > 0)
@@ -323,6 +324,16 @@ describe('Metrics', async () => {
       expect(url).toContain('ec=deprecation')
       expect(url).toContain('ea=somepackage%40unknown')
       expect(url).toContain('el=bad%20things%20are%20bad')
+
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
+      const args = Reporter.addCustomEvent.mostRecentCall.args
+      expect(args[1]).toEqual('deprecation-v3')
+
+      const eventObject = args[0]
+      expect(eventObject.t).toEqual('event')
+      expect(eventObject.ec).toEqual('deprecation-v3')
+      expect(eventObject.ea).toEqual('somepackage@unknown')
+      expect(eventObject.el).toEqual(deprecationMessage)
     })
 
     it('reports a deprecation without metadata specified', async () => {
@@ -363,7 +374,7 @@ describe('Metrics', async () => {
   })
 
   describe('reporting pane items', async () => {
-    describe('when the user is NOT chosen to send events', async () => {
+    describe('when the user has NOT chosen to send events', async () => {
       beforeEach(async () => {
         spyOn(Reporter, 'sendPaneItem')
 
@@ -380,7 +391,7 @@ describe('Metrics', async () => {
       })
     })
 
-    describe('when the user IS chosen to send events', async () => {
+    describe('when the user HAS chosen to send events', async () => {
       beforeEach(async () => {
         const {mainModule} = await atom.packages.activatePackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true
