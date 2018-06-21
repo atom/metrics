@@ -2,15 +2,25 @@
 
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers' // eslint-disable-line no-unused-vars
 import Reporter from '../lib/reporter'
+import store from '../lib/store'
 import grim from 'grim'
 import path from 'path'
 
+
 describe('Metrics', async () => {
   let workspaceElement = []
+  const assertNotCalledHelper = (commandName, additionalArgs) => {
+    Reporter.request.reset()
+
+    atom.commands.dispatch(workspaceElement, commandName, additionalArgs)
+    expect(Reporter.request).not.toHaveBeenCalled()
+    expect(Reporter.addCustomEvent).not.toHaveBeenCalled()
+  }
   beforeEach(() => {
     workspaceElement = atom.views.getView(atom.workspace)
 
     spyOn(Reporter, 'request')
+    spyOn(Reporter, 'addCustomEvent')
 
     let storage = {}
     spyOn(global.localStorage, 'setItem').andCallFake((key, value) => { storage[key] = value })
@@ -20,7 +30,10 @@ describe('Metrics', async () => {
     spyOn(Reporter, 'consented').andReturn(true)
   })
 
-  afterEach(async () => atom.packages.deactivatePackage('metrics'))
+  afterEach(async () => {
+    atom.packages.deactivatePackage('metrics')
+    Reporter.addCustomEvent.reset()
+  })
 
   it('reports events', async () => {
     jasmine.useRealClock()
@@ -149,6 +162,7 @@ describe('Metrics', async () => {
 
         const {mainModule} = atom.packages.getLoadedPackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true
+        Reporter.addCustomEvent.reset()
       })
 
       it('reports commands dispatched via atom.commands', () => {
@@ -156,6 +170,14 @@ describe('Metrics', async () => {
 
         atom.commands.dispatch(workspaceElement, command, null)
         expect(Reporter.commandCount[command]).toBe(1)
+
+        const args = Reporter.addCustomEvent.mostRecentCall.args
+        expect(args[1]).toEqual('command')
+        let event = args[0]
+        expect(event.t).toEqual('event')
+        expect(event.ec).toEqual('command')
+        expect(event.ea).toEqual('some-package')
+        expect(event.el).toEqual('some-package:a-command')
 
         let url = Reporter.request.mostRecentCall.args[0]
         expect(url).toContain('ec=command')
@@ -168,36 +190,27 @@ describe('Metrics', async () => {
 
         url = Reporter.request.mostRecentCall.args[0]
         expect(url).toContain('ev=2')
+        expect(Reporter.addCustomEvent.mostRecentCall.args[0].ev).toEqual(2)
       })
 
       it('does not report editor: and core: commands', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'core:move-up', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
-
-        atom.commands.dispatch(workspaceElement, 'editor:move-to-end-of-line', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertNotCalledHelper('core:move-up')
+        assertNotCalledHelper('editor:move-to-end-of-line')
       })
 
       it('does not report non-namespaced commands', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'dragover', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertNotCalledHelper('dragover')
       })
 
       it('does not report vim-mode:* movement commands', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-up', null)
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-down', null)
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-left', null)
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-right', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertNotCalledHelper('vim-mode:move-up')
+        assertNotCalledHelper('vim-mode:move-down')
+        assertNotCalledHelper('vim-mode:move-left')
+        assertNotCalledHelper('vim-mode:move-right')
       })
 
       it('does not report commands triggered via jquery', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'some-package:a-command', {jQueryTrigger: 'trigger'})
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertNotCalledHelper('some-package:a-command', {jQueryTrigger: 'trigger'})
       })
     })
   })
@@ -343,6 +356,7 @@ describe('Metrics', async () => {
         mainModule.shouldIncludePanesAndCommands = true
 
         await conditionPromise(() => Reporter.request.callCount > 0)
+        await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
       })
 
       it('will report pane items', async () => {
@@ -442,6 +456,7 @@ describe('Metrics', async () => {
       await atom.packages.activatePackage('metrics').then(pack => {
         reporterService = pack.mainModule.provideReporter()
       })
+
       await conditionPromise(() => Reporter.request.callCount > 0)
       Reporter.request.reset()
     })
@@ -450,6 +465,14 @@ describe('Metrics', async () => {
       it('makes a request', () => {
         reporterService.sendEvent('cat', 'action', 'label')
         expect(Reporter.request).toHaveBeenCalled()
+      })
+    )
+
+    describe('::addCustomEvent', () =>
+      it('adds a custom event', () => {
+        // spyOn(store, 'addCustomEvent')
+        reporterService.addCustomEvent({woo: 'hoo'}, 'yass queen!')
+        // expect(store.addCustomEvent).toHaveBeenCalled()
       })
     )
 
