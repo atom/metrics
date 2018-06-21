@@ -20,7 +20,7 @@ describe('Metrics', async () => {
     workspaceElement = atom.views.getView(atom.workspace)
 
     spyOn(Reporter, 'request')
-    spyOn(Reporter, 'addCustomEvent')
+    spyOn(Reporter, 'addCustomEvent').andCallThrough()
 
     let storage = {}
     spyOn(global.localStorage, 'setItem').andCallFake((key, value) => { storage[key] = value })
@@ -500,9 +500,19 @@ describe('Metrics', async () => {
 
     describe('::addCustomEvent', () =>
       it('adds a custom event', () => {
-        // spyOn(store, 'addCustomEvent')
-        reporterService.addCustomEvent({woo: 'hoo'}, 'yass queen!')
-        // expect(store.addCustomEvent).toHaveBeenCalled()
+        spyOn(store, 'addCustomEvent')
+        const args = [{ woo: 'hoo'}, 'yass queen!']
+        reporterService.addCustomEvent(...args)
+        expect(store.addCustomEvent).toHaveBeenCalledWith(...args)
+      })
+    )
+
+    describe('::incrementCounter', () =>
+      it('increments a counter', () => {
+        spyOn(store, 'incrementCounter')
+        const counterName = 'commits'
+        reporterService.incrementCounter(counterName)
+        expect(store.incrementCounter).toHaveBeenCalledWith(counterName)
       })
     )
 
