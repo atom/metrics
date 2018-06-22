@@ -441,6 +441,16 @@ describe('Metrics', async () => {
               url.includes('ev=1')
           })
         })
+        await conditionPromise(() => {
+          return Reporter.addCustomEvent.calls.find((call) => {
+            const eventObject = call.args[0]
+            const eventName = call.args[1]
+            return eventName === 'package'
+             && eventObject.t === 'event'
+             && eventObject.ea === 'numberOptionalPackagesActivatedAtStartup'
+             && eventObject.ev === 1
+          })
+        })
       })
 
       afterEach(() => {
@@ -465,6 +475,16 @@ describe('Metrics', async () => {
               url.includes('ec=package') &&
               url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
               url.includes('ev=0')
+          })
+        })
+        await conditionPromise(() => {
+          return Reporter.addCustomEvent.calls.find((call) => {
+            const eventObject = call.args[0]
+            const eventName = call.args[1]
+            return eventName === 'package'
+             && eventObject.t === 'event'
+             && eventObject.ea === 'numberOptionalPackagesActivatedAtStartup'
+             && eventObject.ev === 0
           })
         })
       })
