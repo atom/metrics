@@ -6,7 +6,6 @@ import store from '../lib/store'
 import grim from 'grim'
 import path from 'path'
 
-
 describe('Metrics', async () => {
   let workspaceElement = []
   const assertNotCalledHelper = (commandName, additionalArgs) => {
@@ -494,7 +493,7 @@ describe('Metrics', async () => {
     describe('::addCustomEvent', () =>
       it('adds a custom event', () => {
         spyOn(store, 'addCustomEvent')
-        const args = [{ woo: 'hoo'}, 'yass queen!']
+        const args = [{ woo: 'hoo' }, 'yass queen!']
         reporterService.addCustomEvent(...args)
         expect(store.addCustomEvent).toHaveBeenCalledWith(...args)
       })
