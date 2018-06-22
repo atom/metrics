@@ -374,24 +374,36 @@ describe('Metrics', async () => {
   })
 
   describe('reporting pane items', async () => {
-    describe('when the user has NOT chosen to send events', async () => {
+    describe('when shouldIncludePanesAndCommands is false', async () => {
       beforeEach(async () => {
         spyOn(Reporter, 'sendPaneItem')
+        spyOn(Reporter, 'sendEvent')
 
         const {mainModule} = await atom.packages.activatePackage('metrics')
+
         mainModule.shouldIncludePanesAndCommands = false
 
         await conditionPromise(() => Reporter.request.callCount > 0)
       })
 
       it('will not report pane items', async () => {
+        Reporter.addCustomEvent.reset()
+        Reporter.sendEvent.reset()
+
         await atom.workspace.open('file1.txt')
 
         expect(Reporter.sendPaneItem.callCount).toBe(0)
+        // the file open events are still getting published, because we are subscribed
+        // to file open events separately in the begin method.
+        // todo: figure out if we intend to send file events even when shouldIncludePanesAndCommands
+        // is false, or if this is a bug.
+
+        // expect(Reporter.sendEvent.callCount).toBe(0)
+        // expect(Reporter.addCustomEvent.callCount).toBe(0)
       })
     })
 
-    describe('when the user HAS chosen to send events', async () => {
+    describe('when shouldIncludePanesAndCommands is true', async () => {
       beforeEach(async () => {
         const {mainModule} = await atom.packages.activatePackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true

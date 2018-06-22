@@ -11,8 +11,7 @@
   "providedServices": {
     "metrics-reporter": {
       "versions": {
-        "1.0.0": "provideReporter",
-        "2.0.0": "provideReporterV2"
+        "1.0.0": "provideReporter"
       }
     }
   },
