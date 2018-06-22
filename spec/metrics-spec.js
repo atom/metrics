@@ -263,28 +263,28 @@ describe('Metrics', async () => {
 
     describe('when there are paths in the exception', () => {
       it('strips unix paths surrounded in quotes', () => {
-        let message = "Error: ENOENT, unlink '/Users/someguy/path/file.js'"
+        let message = "Error: ENOENT, unlink '/Users/someuser/path/file.js'"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: ENOENT, unlink <path>')
       })
 
       it('strips unix paths without quotes', () => {
-        let message = 'Uncaught Error: spawn /Users/someguy.omg/path/file-09238_ABC-Final-Final.js ENOENT'
+        let message = 'Uncaught Error: spawn /Users/someuser.omg/path/file-09238_ABC-Final-Final.js ENOENT'
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: spawn <path> ENOENT')
       })
 
       it('strips windows paths without quotes', () => {
-        let message = 'Uncaught Error: spawn c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT'
+        let message = 'Uncaught Error: spawn c:\\someuser.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT'
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: spawn <path> ENOENT')
       })
 
       it('strips windows paths surrounded in quotes', () => {
-        let message = "Uncaught Error: EACCES 'c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
+        let message = "Uncaught Error: EACCES 'c:\\someuser.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: EACCES <path>')
