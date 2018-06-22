@@ -34,6 +34,25 @@ describe('Metrics', async () => {
     Reporter.addCustomEvent.reset()
   })
 
+  it('reports consent opt-out changes', async () => {
+    await atom.packages.activatePackage('metrics')
+    spyOn(store, 'setOptOut')
+    spyOn(Reporter, 'sendEvent')
+    await atom.config.set('core.telemetryConsent', 'no')
+    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(["setting", "core.telemetryConsent", "no"])
+    expect(store.setOptOut.mostRecentCall.args[0]).toEqual(true)
+  })
+
+  it('reports consent opt-in changes', async () => {
+    await atom.packages.activatePackage('metrics')
+    spyOn(store, 'setOptOut')
+    spyOn(Reporter, 'sendEvent')
+    await atom.config.set('core.telemetryConsent', 'limited')
+
+    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(["setting", "core.telemetryConsent", "limited"])
+    expect(store.setOptOut.mostRecentCall.args[0]).toEqual(false)
+  })
+
   it('reports events', async () => {
     jasmine.useRealClock()
     await atom.packages.activatePackage('metrics')
@@ -166,7 +185,7 @@ describe('Metrics', async () => {
   })
 
   describe('reporting commands', async () => {
-    describe('when the user has NOT chosen to send commands', async () => {
+    describe('when shouldIncludePanesAndCommands is false', async () => {
       beforeEach(async () => {
         global.localStorage.setItem('metrics.userId', 'a')
         await atom.packages.activatePackage('metrics')
@@ -184,7 +203,7 @@ describe('Metrics', async () => {
       })
     })
 
-    describe('when the user is chosen to send commands', async () => {
+    describe('when shouldIncludePanesAndCommands is true', async () => {
       beforeEach(async () => {
         global.localStorage.setItem('metrics.userId', 'd')
         await atom.packages.activatePackage('metrics')
