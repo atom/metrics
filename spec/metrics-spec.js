@@ -39,7 +39,7 @@ describe('Metrics', async () => {
     spyOn(store, 'setOptOut')
     spyOn(Reporter, 'sendEvent')
     await atom.config.set('core.telemetryConsent', 'no')
-    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(["setting", "core.telemetryConsent", "no"])
+    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(['setting', 'core.telemetryConsent', 'no'])
     expect(store.setOptOut.mostRecentCall.args[0]).toEqual(true)
   })
 
@@ -49,7 +49,7 @@ describe('Metrics', async () => {
     spyOn(Reporter, 'sendEvent')
     await atom.config.set('core.telemetryConsent', 'limited')
 
-    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(["setting", "core.telemetryConsent", "limited"])
+    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(['setting', 'core.telemetryConsent', 'limited'])
     expect(store.setOptOut.mostRecentCall.args[0]).toEqual(false)
   })
 
@@ -475,10 +475,10 @@ describe('Metrics', async () => {
           return Reporter.addCustomEvent.calls.find((call) => {
             const eventObject = call.args[0]
             const eventName = call.args[1]
-            return eventName === 'package'
-             && eventObject.t === 'event'
-             && eventObject.ea === 'numberOptionalPackagesActivatedAtStartup'
-             && eventObject.ev === 1
+            return eventName === 'package' &&
+             eventObject.t === 'event' &&
+             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
+             eventObject.ev === 1
           })
         })
       })
@@ -511,10 +511,10 @@ describe('Metrics', async () => {
           return Reporter.addCustomEvent.calls.find((call) => {
             const eventObject = call.args[0]
             const eventName = call.args[1]
-            return eventName === 'package'
-             && eventObject.t === 'event'
-             && eventObject.ea === 'numberOptionalPackagesActivatedAtStartup'
-             && eventObject.ev === 0
+            return eventName === 'package' &&
+             eventObject.t === 'event' &&
+             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
+             eventObject.ev === 0
           })
         })
       })
