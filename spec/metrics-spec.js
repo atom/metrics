@@ -122,6 +122,16 @@ describe('Metrics', async () => {
       expect(url).toContain('aiid=stable')
     })
 
+    it('reports the nightly release channel', async () => {
+      spyOn(atom, 'getVersion').andReturn('1.0.2-nightly55')
+
+      await atom.packages.activatePackage('metrics')
+      await conditionPromise(() => Reporter.request.callCount > 0)
+
+      let url = Reporter.request.mostRecentCall.args[0]
+      expect(url).toContain('aiid=nightly')
+    })
+
     it('reports an arbitrary release channel', async () => {
       spyOn(atom, 'getVersion').andReturn('1.0.2-sushi1')
 
@@ -132,14 +142,14 @@ describe('Metrics', async () => {
       expect(url).toContain('aiid=sushi')
     })
 
-    it('reports an unknown release channel', async () => {
+    it('reports an unrecognized release channel', async () => {
       spyOn(atom, 'getVersion').andReturn('wat.0.2')
 
       await atom.packages.activatePackage('metrics')
       await conditionPromise(() => Reporter.request.callCount > 0)
 
       let url = Reporter.request.mostRecentCall.args[0]
-      expect(url).toContain('aiid=unknown')
+      expect(url).toContain('aiid=unrecognized')
     })
   })
 
