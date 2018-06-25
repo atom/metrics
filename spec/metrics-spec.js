@@ -405,7 +405,6 @@ describe('Metrics', async () => {
       })
 
       it('will not report pane items', async () => {
-
         await atom.workspace.open('file1.txt')
 
         expect(Reporter.sendPaneItem.callCount).toBe(0)
