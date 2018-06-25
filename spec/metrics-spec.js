@@ -131,6 +131,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=dev')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('dev')
     })
 
     it('reports the beta release channel', async () => {
@@ -141,6 +143,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=beta')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('beta')
     })
 
     it('reports the stable release channel', async () => {
@@ -151,6 +155,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=stable')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('stable')
     })
 
     it('reports the nightly release channel', async () => {
@@ -161,6 +167,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=nightly')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('nightly')
     })
 
     it('reports an arbitrary release channel', async () => {
@@ -171,6 +179,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=sushi')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('sushi')
     })
 
     it('reports an unrecognized release channel', async () => {
