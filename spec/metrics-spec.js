@@ -8,7 +8,7 @@ import path from 'path'
 
 describe('Metrics', async () => {
   let workspaceElement = []
-  const assertNotCalledHelper = (commandName, additionalArgs) => {
+  const assertCommandNotReported = (commandName, additionalArgs) => {
     Reporter.request.reset()
 
     atom.commands.dispatch(workspaceElement, commandName, additionalArgs)
@@ -242,23 +242,23 @@ describe('Metrics', async () => {
       })
 
       it('does not report editor: and core: commands', () => {
-        assertNotCalledHelper('core:move-up')
-        assertNotCalledHelper('editor:move-to-end-of-line')
+        assertCommandNotReported('core:move-up')
+        assertCommandNotReported('editor:move-to-end-of-line')
       })
 
       it('does not report non-namespaced commands', () => {
-        assertNotCalledHelper('dragover')
+        assertCommandNotReported('dragover')
       })
 
       it('does not report vim-mode:* movement commands', () => {
-        assertNotCalledHelper('vim-mode:move-up')
-        assertNotCalledHelper('vim-mode:move-down')
-        assertNotCalledHelper('vim-mode:move-left')
-        assertNotCalledHelper('vim-mode:move-right')
+        assertCommandNotReported('vim-mode:move-up')
+        assertCommandNotReported('vim-mode:move-down')
+        assertCommandNotReported('vim-mode:move-left')
+        assertCommandNotReported('vim-mode:move-right')
       })
 
       it('does not report commands triggered via jquery', () => {
-        assertNotCalledHelper('some-package:a-command', {jQueryTrigger: 'trigger'})
+        assertCommandNotReported('some-package:a-command', {jQueryTrigger: 'trigger'})
       })
     })
   })
