@@ -190,8 +190,8 @@ describe('Metrics', async () => {
         expect(Reporter.commandCount[command]).toBe(1)
 
         const args = Reporter.addCustomEvent.mostRecentCall.args
-        expect(args[1]).toEqual('command')
-        let event = args[0]
+        expect(args[0]).toEqual('command')
+        let event = args[1]
         expect(event.t).toEqual('event')
         expect(event.ec).toEqual('command')
         expect(event.ea).toEqual('some-package')
@@ -208,7 +208,7 @@ describe('Metrics', async () => {
 
         url = Reporter.request.mostRecentCall.args[0]
         expect(url).toContain('ev=2')
-        expect(Reporter.addCustomEvent.mostRecentCall.args[0].ev).toEqual(2)
+        expect(Reporter.addCustomEvent.mostRecentCall.args[1].ev).toEqual(2)
       })
 
       it('does not report editor: and core: commands', () => {
@@ -315,9 +315,9 @@ describe('Metrics', async () => {
 
       await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
       const args = Reporter.addCustomEvent.mostRecentCall.args
-      expect(args[1]).toEqual('deprecation-v3')
+      expect(args[0]).toEqual('deprecation-v3')
 
-      const eventObject = args[0]
+      const eventObject = args[1]
       expect(eventObject.t).toEqual('event')
       expect(eventObject.ec).toEqual('deprecation-v3')
       expect(eventObject.ea).toEqual('somepackage@unknown')
@@ -441,8 +441,8 @@ describe('Metrics', async () => {
         })
         await conditionPromise(() => {
           return Reporter.addCustomEvent.calls.find((call) => {
-            const eventObject = call.args[0]
-            const eventType = call.args[1]
+            const eventType = call.args[0]
+            const eventObject = call.args[1]
             return eventType === 'package' &&
              eventObject.t === 'event' &&
              eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
@@ -477,8 +477,8 @@ describe('Metrics', async () => {
         })
         await conditionPromise(() => {
           return Reporter.addCustomEvent.calls.find((call) => {
-            const eventObject = call.args[0]
-            const eventName = call.args[1]
+            const eventName = call.args[0]
+            const eventObject = call.args[1]
             return eventName === 'package' &&
              eventObject.t === 'event' &&
              eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
@@ -530,7 +530,7 @@ describe('Metrics', async () => {
     describe('::addCustomEvent', () =>
       it('adds a custom event', () => {
         spyOn(store, 'addCustomEvent')
-        const args = [{ woo: 'hoo' }, 'yass queen!']
+        const args = ['yass queen!', { woo: 'hoo' }]
         reporterService.addCustomEvent(...args)
         expect(store.addCustomEvent).toHaveBeenCalledWith(...args)
       })
