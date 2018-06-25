@@ -39,6 +39,7 @@ describe('Metrics', async () => {
     spyOn(store, 'setOptOut')
     spyOn(Reporter, 'sendEvent')
     await atom.config.set('core.telemetryConsent', 'no')
+
     expect(Reporter.sendEvent.mostRecentCall.args).toEqual(['setting', 'core.telemetryConsent', 'no'])
     expect(store.setOptOut.mostRecentCall.args[0]).toEqual(true)
   })
