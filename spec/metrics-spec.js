@@ -472,8 +472,8 @@ describe('Metrics', async () => {
         await conditionPromise(() => {
           return Reporter.addCustomEvent.calls.find((call) => {
             const eventObject = call.args[0]
-            const eventName = call.args[1]
-            return eventName === 'package' &&
+            const eventType = call.args[1]
+            return eventType === 'package' &&
              eventObject.t === 'event' &&
              eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
              eventObject.ev === 1
