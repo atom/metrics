@@ -415,16 +415,12 @@ describe('Metrics', async () => {
       })
 
       it('will not report pane items', async () => {
-        await atom.workspace.open('file1.txt')
+        Reporter.sendEvent.reset()
+        await atom.packages.emitter.emit('did-add-pane')
 
         expect(Reporter.sendPaneItem.callCount).toBe(0)
-        // the file open events are still getting published, because we are subscribed
-        // to file open events separately in the begin method.
-        // todo: figure out if we intend to send file events even when shouldIncludePanesAndCommands
-        // is false, or if this is a bug.
-
-        // expect(Reporter.sendEvent.callCount).toBe(0)
-        // expect(Reporter.addCustomEvent.callCount).toBe(0)
+        expect(Reporter.sendEvent.callCount).toBe(0)
+        expect(Reporter.addCustomEvent.callCount).toBe(0)
       })
     })
 
