@@ -31,7 +31,6 @@ describe('Metrics', async () => {
 
   afterEach(async () => {
     atom.packages.deactivatePackage('metrics')
-    Reporter.addCustomEvent.reset()
   })
 
   it('reports consent opt-out changes', async () => {
@@ -406,8 +405,6 @@ describe('Metrics', async () => {
       })
 
       it('will not report pane items', async () => {
-        Reporter.addCustomEvent.reset()
-        Reporter.sendEvent.reset()
 
         await atom.workspace.open('file1.txt')
 
