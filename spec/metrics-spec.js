@@ -121,6 +121,26 @@ describe('Metrics', async () => {
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=stable')
     })
+
+    it('reports an arbitrary release channel', async () => {
+      spyOn(atom, 'getVersion').andReturn('1.0.2-sushi1')
+
+      await atom.packages.activatePackage('metrics')
+      await conditionPromise(() => Reporter.request.callCount > 0)
+
+      let url = Reporter.request.mostRecentCall.args[0]
+      expect(url).toContain('aiid=sushi')
+    })
+
+    it('reports an unknown release channel', async () => {
+      spyOn(atom, 'getVersion').andReturn('wat.0.2')
+
+      await atom.packages.activatePackage('metrics')
+      await conditionPromise(() => Reporter.request.callCount > 0)
+
+      let url = Reporter.request.mostRecentCall.args[0]
+      expect(url).toContain('aiid=unknown')
+    })
   })
 
   describe('reporting commands', async () => {
