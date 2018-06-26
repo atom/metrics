@@ -580,6 +580,19 @@ describe('Metrics', async () => {
       })
     )
 
+    describe('::sendTimingV2', () =>
+      it('sends timing to StatsStore', () => {
+        spyOn(store, 'addTiming')
+        const eventType = "appStart"
+        const timingInMilliseconds = 42
+        const metadata = { glitter: "beard"}
+        const args = [ eventType, timingInMilliseconds, metadata]
+        reporterService.sendTimingV2(eventType, timingInMilliseconds, metadata)
+        console.log(store.addTiming.mostRecentCall.args)
+        expect(store.addTiming).toHaveBeenCalledWith(...args)
+      })
+    )
+
     describe('::sendTiming', () =>
       it('makes a request', () => {
         reporterService.sendEvent('cat', 'name')
