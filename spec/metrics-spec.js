@@ -273,6 +273,26 @@ describe('Metrics', async () => {
     })
   })
 
+  describe('reporting timings', async () => {
+    it('reports timing metrics', async () => {
+      spyOn(Reporter, 'sendTimingV2')
+      spyOn(Reporter, 'sendTiming').andCallThrough()
+      await atom.packages.activatePackage('metrics')
+      const expectedLoadTime = atom.getWindowLoadTime()
+
+      const sendTimingArgs = Reporter.sendTiming.mostRecentCall.args
+      expect(sendTimingArgs[0]).toEqual("core")
+      expect(sendTimingArgs[1]).toEqual("load")
+      expect(sendTimingArgs[2]).toEqual(expectedLoadTime)
+
+      const sendTimingV2Args = Reporter.sendTimingV2.mostRecentCall.args
+      expect(sendTimingV2Args[0]).toEqual("load")
+      expect(sendTimingV2Args[1]).toEqual(expectedLoadTime)
+      expect(sendTimingV2Args[2]).toEqual({ category: "core"})
+
+    })
+  })
+
   describe('reporting exceptions', async () => {
     beforeEach(async () => {
       spyOn(atom, 'openDevTools').andReturn(Promise.resolve())
@@ -588,7 +608,6 @@ describe('Metrics', async () => {
         const metadata = { glitter: "beard"}
         const args = [ eventType, timingInMilliseconds, metadata]
         reporterService.sendTimingV2(eventType, timingInMilliseconds, metadata)
-        console.log(store.addTiming.mostRecentCall.args)
         expect(store.addTiming).toHaveBeenCalledWith(...args)
       })
     )
