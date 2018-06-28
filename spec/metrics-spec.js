@@ -275,7 +275,7 @@ describe('Metrics', async () => {
 
   describe('reporting timings', async () => {
     it('reports timing metrics', async () => {
-      spyOn(Reporter, 'sendTimingV2')
+      spyOn(Reporter, 'addTiming')
       spyOn(Reporter, 'sendTiming').andCallThrough()
       await atom.packages.activatePackage('metrics')
       const expectedLoadTime = atom.getWindowLoadTime()
@@ -285,10 +285,10 @@ describe('Metrics', async () => {
       expect(sendTimingArgs[1]).toEqual('load')
       expect(sendTimingArgs[2]).toEqual(expectedLoadTime)
 
-      const sendTimingV2Args = Reporter.sendTimingV2.mostRecentCall.args
-      expect(sendTimingV2Args[0]).toEqual('load')
-      expect(sendTimingV2Args[1]).toEqual(expectedLoadTime)
-      expect(sendTimingV2Args[2]).toEqual({category: 'core'})
+      const addTimingArgs = Reporter.addTiming.mostRecentCall.args
+      expect(addTimingArgs[0]).toEqual('load')
+      expect(addTimingArgs[1]).toEqual(expectedLoadTime)
+      expect(addTimingArgs[2]).toEqual({category: 'core'})
     })
   })
 
@@ -599,14 +599,14 @@ describe('Metrics', async () => {
       })
     )
 
-    describe('::sendTimingV2', () =>
+    describe('::addTiming', () =>
       it('sends timing to StatsStore', () => {
         spyOn(store, 'addTiming')
         const eventType = 'appStart'
         const timingInMilliseconds = 42
         const metadata = {glitter: 'beard'}
         const args = [eventType, timingInMilliseconds, metadata]
-        reporterService.sendTimingV2(eventType, timingInMilliseconds, metadata)
+        reporterService.addTiming(eventType, timingInMilliseconds, metadata)
         expect(store.addTiming).toHaveBeenCalledWith(...args)
       })
     )
