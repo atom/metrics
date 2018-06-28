@@ -75,49 +75,58 @@ describe('Metrics', async () => {
     expect(url).toMatch(/^https:\/\/ssl.google-analytics.com\/collect\?/)
   })
 
-  it('reports actual processor architecture', async () => {
-    let expectedArch = process.env.PROCESSOR_ARCHITEW6432 === 'AMD64' ? 'x64' : process.arch
+  describe('event metadata', async () => {
+    beforeEach(() => {
+      spyOn(store, 'addTiming')
+    })
+    const assertMetadataSent = async (expectedName, expectedValue) => {
+      await atom.packages.activatePackage('metrics')
 
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => Reporter.request.callCount > 0)
+      const url = Reporter.request.mostRecentCall.args[0]
+      expect(url).toContain(`${expectedName}=${expectedValue}`)
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain(`cd2=${expectedArch}`)
-  })
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
+      let metadata = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(metadata[expectedName]).toEqual(expectedValue)
 
-  it('specifies anonymization', async () => {
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => store.addTiming.callCount > 0)
+      metadata = store.addTiming.mostRecentCall.args[2]
+      expect(metadata[expectedName]).toEqual(expectedValue)
+    }
+    it('reports actual processor architecture', async () => {
+      const expectedArch = process.env.PROCESSOR_ARCHITEW6432 === 'AMD64' ? 'x64' : process.arch
+      await assertMetadataSent('cd2', expectedArch)
+    })
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain('&aip=1&')
-  })
+    it('specifies anonymization', async () => {
+      // it appears that aip is a value that only needs to be sent
+      // to Google Analytics, so no need to use the assertMetadataSent helper here.
+      await atom.packages.activatePackage('metrics')
+      await conditionPromise(() => Reporter.request.callCount > 0)
 
-  it('specifies screen resolution', async () => {
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+      let url = Reporter.request.mostRecentCall.args[0]
+      expect(url).toContain('&aip=1&')
+    })
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain(`&sr=${window.screen.width}x${window.screen.height}&`)
-  })
+    it('specifies screen resolution', async () => {
+      const expectedScreenResolution = `${window.screen.width}x${window.screen.height}`
+      await assertMetadataSent('sr', expectedScreenResolution)
+    })
 
-  it('specifies window resolution', async () => {
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+    it('specifies window resolution', async () => {
+      const expectedWindowResolution = `${window.innerWidth}x${window.innerHeight}`
+      await assertMetadataSent('vp', expectedWindowResolution)
+    })
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain(`&vp=${window.innerWidth}x${window.innerHeight}&`)
-  })
+    it('specifies heap usage in MB and %', async () => {
+      spyOn(process, 'memoryUsage').andReturn({heapTotal: 234567890, heapUsed: 123456789})
 
-  it('specifies heap usage in MB and %', async () => {
-    spyOn(process, 'memoryUsage').andReturn({heapTotal: 234567890, heapUsed: 123456789})
-
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
-
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain('&cm1=117&')
-    expect(url).toContain('&cm2=53&')
+      const heapUsedInMb = 117
+      const heapUsedPercentage = 53
+      await assertMetadataSent('cm1', heapUsedInMb)
+      await assertMetadataSent('cm2', heapUsedPercentage)
+    })
   })
 
   describe('reporting release channel', async () => {
