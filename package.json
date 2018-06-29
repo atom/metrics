@@ -11,14 +11,15 @@
   "providedServices": {
     "metrics-reporter": {
       "versions": {
-        "1.0.0": "provideReporter"
+        "1.1.0": "provideReporter"
       }
     }
   },
   "dependencies": {
     "fs-plus": "^3.0.0",
     "grim": "^2.0.1",
-    "node-uuid": "~1.4.7"
+    "node-uuid": "~1.4.7",
+    "telemetry-github": "0.0.9"
   },
   "devDependencies": {
     "standard": "*"

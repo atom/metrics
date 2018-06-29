@@ -2,15 +2,24 @@
 
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers' // eslint-disable-line no-unused-vars
 import Reporter from '../lib/reporter'
+import store from '../lib/store'
 import grim from 'grim'
 import path from 'path'
 
 describe('Metrics', async () => {
   let workspaceElement = []
+  const assertCommandNotReported = (commandName, additionalArgs) => {
+    Reporter.request.reset()
+
+    atom.commands.dispatch(workspaceElement, commandName, additionalArgs)
+    expect(Reporter.request).not.toHaveBeenCalled()
+    expect(Reporter.addCustomEvent).not.toHaveBeenCalled()
+  }
   beforeEach(() => {
     workspaceElement = atom.views.getView(atom.workspace)
 
     spyOn(Reporter, 'request')
+    spyOn(Reporter, 'addCustomEvent').andCallThrough()
 
     let storage = {}
     spyOn(global.localStorage, 'setItem').andCallFake((key, value) => { storage[key] = value })
@@ -20,7 +29,29 @@ describe('Metrics', async () => {
     spyOn(Reporter, 'consented').andReturn(true)
   })
 
-  afterEach(async () => atom.packages.deactivatePackage('metrics'))
+  afterEach(async () => {
+    atom.packages.deactivatePackage('metrics')
+  })
+
+  it('reports consent opt-out changes', async () => {
+    await atom.packages.activatePackage('metrics')
+    spyOn(store, 'setOptOut')
+    spyOn(Reporter, 'sendEvent')
+    await atom.config.set('core.telemetryConsent', 'no')
+
+    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(['setting', 'core.telemetryConsent', 'no'])
+    expect(store.setOptOut.mostRecentCall.args[0]).toEqual(true)
+  })
+
+  it('reports consent opt-in changes', async () => {
+    await atom.packages.activatePackage('metrics')
+    spyOn(store, 'setOptOut')
+    spyOn(Reporter, 'sendEvent')
+    await atom.config.set('core.telemetryConsent', 'limited')
+
+    expect(Reporter.sendEvent.mostRecentCall.args).toEqual(['setting', 'core.telemetryConsent', 'limited'])
+    expect(store.setOptOut.mostRecentCall.args[0]).toEqual(false)
+  })
 
   it('reports events', async () => {
     jasmine.useRealClock()
@@ -44,49 +75,58 @@ describe('Metrics', async () => {
     expect(url).toMatch(/^https:\/\/ssl.google-analytics.com\/collect\?/)
   })
 
-  it('reports actual processor architecture', async () => {
-    let expectedArch = process.env.PROCESSOR_ARCHITEW6432 === 'AMD64' ? 'x64' : process.arch
+  describe('event metadata', async () => {
+    beforeEach(() => {
+      spyOn(store, 'addTiming')
+    })
+    const assertMetadataSent = async (expectedName, expectedValue) => {
+      await atom.packages.activatePackage('metrics')
 
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => Reporter.request.callCount > 0)
+      const url = Reporter.request.mostRecentCall.args[0]
+      expect(url).toContain(`${expectedName}=${expectedValue}`)
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain(`cd2=${expectedArch}`)
-  })
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
+      let metadata = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(metadata[expectedName]).toEqual(expectedValue)
 
-  it('specifies anonymization', async () => {
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => store.addTiming.callCount > 0)
+      metadata = store.addTiming.mostRecentCall.args[2]
+      expect(metadata[expectedName]).toEqual(expectedValue)
+    }
+    it('reports actual processor architecture', async () => {
+      const expectedArch = process.env.PROCESSOR_ARCHITEW6432 === 'AMD64' ? 'x64' : process.arch
+      await assertMetadataSent('cd2', expectedArch)
+    })
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain('&aip=1&')
-  })
+    it('specifies anonymization', async () => {
+      // it appears that aip is a value that only needs to be sent
+      // to Google Analytics, so no need to use the assertMetadataSent helper here.
+      await atom.packages.activatePackage('metrics')
+      await conditionPromise(() => Reporter.request.callCount > 0)
 
-  it('specifies screen resolution', async () => {
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+      let url = Reporter.request.mostRecentCall.args[0]
+      expect(url).toContain('&aip=1&')
+    })
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain(`&sr=${window.screen.width}x${window.screen.height}&`)
-  })
+    it('specifies screen resolution', async () => {
+      const expectedScreenResolution = `${window.screen.width}x${window.screen.height}`
+      await assertMetadataSent('sr', expectedScreenResolution)
+    })
 
-  it('specifies window resolution', async () => {
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
+    it('specifies window resolution', async () => {
+      const expectedWindowResolution = `${window.innerWidth}x${window.innerHeight}`
+      await assertMetadataSent('vp', expectedWindowResolution)
+    })
 
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain(`&vp=${window.innerWidth}x${window.innerHeight}&`)
-  })
+    it('specifies heap usage in MB and %', async () => {
+      spyOn(process, 'memoryUsage').andReturn({heapTotal: 234567890, heapUsed: 123456789})
 
-  it('specifies heap usage in MB and %', async () => {
-    spyOn(process, 'memoryUsage').andReturn({heapTotal: 234567890, heapUsed: 123456789})
-
-    await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount > 0)
-
-    let url = Reporter.request.mostRecentCall.args[0]
-    expect(url).toContain('&cm1=117&')
-    expect(url).toContain('&cm2=53&')
+      const heapUsedInMb = 117
+      const heapUsedPercentage = 53
+      await assertMetadataSent('cm1', heapUsedInMb)
+      await assertMetadataSent('cm2', heapUsedPercentage)
+    })
   })
 
   describe('reporting release channel', async () => {
@@ -100,6 +140,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=dev')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('dev')
     })
 
     it('reports the beta release channel', async () => {
@@ -110,6 +152,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=beta')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('beta')
     })
 
     it('reports the stable release channel', async () => {
@@ -120,6 +164,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=stable')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('stable')
     })
 
     it('reports the nightly release channel', async () => {
@@ -130,6 +176,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=nightly')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('nightly')
     })
 
     it('reports an arbitrary release channel', async () => {
@@ -140,6 +188,8 @@ describe('Metrics', async () => {
 
       let url = Reporter.request.mostRecentCall.args[0]
       expect(url).toContain('aiid=sushi')
+      let event = Reporter.addCustomEvent.mostRecentCall.args[1]
+      expect(event.aiid).toEqual('sushi')
     })
 
     it('reports an unrecognized release channel', async () => {
@@ -154,7 +204,7 @@ describe('Metrics', async () => {
   })
 
   describe('reporting commands', async () => {
-    describe('when the user is NOT chosen to send commands', async () => {
+    describe('when shouldIncludePanesAndCommands is false', async () => {
       beforeEach(async () => {
         global.localStorage.setItem('metrics.userId', 'a')
         await atom.packages.activatePackage('metrics')
@@ -172,13 +222,14 @@ describe('Metrics', async () => {
       })
     })
 
-    describe('when the user is chosen to send commands', async () => {
+    describe('when shouldIncludePanesAndCommands is true', async () => {
       beforeEach(async () => {
         global.localStorage.setItem('metrics.userId', 'd')
         await atom.packages.activatePackage('metrics')
 
         const {mainModule} = atom.packages.getLoadedPackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true
+        Reporter.addCustomEvent.reset()
       })
 
       it('reports commands dispatched via atom.commands', () => {
@@ -186,6 +237,14 @@ describe('Metrics', async () => {
 
         atom.commands.dispatch(workspaceElement, command, null)
         expect(Reporter.commandCount[command]).toBe(1)
+
+        const args = Reporter.addCustomEvent.mostRecentCall.args
+        expect(args[0]).toEqual('command')
+        let event = args[1]
+        expect(event.t).toEqual('event')
+        expect(event.ec).toEqual('command')
+        expect(event.ea).toEqual('some-package')
+        expect(event.el).toEqual('some-package:a-command')
 
         let url = Reporter.request.mostRecentCall.args[0]
         expect(url).toContain('ec=command')
@@ -198,37 +257,47 @@ describe('Metrics', async () => {
 
         url = Reporter.request.mostRecentCall.args[0]
         expect(url).toContain('ev=2')
+        expect(Reporter.addCustomEvent.mostRecentCall.args[1].ev).toEqual(2)
       })
 
       it('does not report editor: and core: commands', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'core:move-up', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
-
-        atom.commands.dispatch(workspaceElement, 'editor:move-to-end-of-line', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertCommandNotReported('core:move-up')
+        assertCommandNotReported('editor:move-to-end-of-line')
       })
 
       it('does not report non-namespaced commands', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'dragover', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertCommandNotReported('dragover')
       })
 
       it('does not report vim-mode:* movement commands', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-up', null)
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-down', null)
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-left', null)
-        atom.commands.dispatch(workspaceElement, 'vim-mode:move-right', null)
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertCommandNotReported('vim-mode:move-up')
+        assertCommandNotReported('vim-mode:move-down')
+        assertCommandNotReported('vim-mode:move-left')
+        assertCommandNotReported('vim-mode:move-right')
       })
 
       it('does not report commands triggered via jquery', () => {
-        Reporter.request.reset()
-        atom.commands.dispatch(workspaceElement, 'some-package:a-command', {jQueryTrigger: 'trigger'})
-        expect(Reporter.request).not.toHaveBeenCalled()
+        assertCommandNotReported('some-package:a-command', {jQueryTrigger: 'trigger'})
       })
+    })
+  })
+
+  describe('reporting timings', async () => {
+    it('reports timing metrics', async () => {
+      spyOn(Reporter, 'addTiming')
+      spyOn(Reporter, 'sendTiming').andCallThrough()
+      await atom.packages.activatePackage('metrics')
+      const expectedLoadTime = atom.getWindowLoadTime()
+
+      const sendTimingArgs = Reporter.sendTiming.mostRecentCall.args
+      expect(sendTimingArgs[0]).toEqual('core')
+      expect(sendTimingArgs[1]).toEqual('load')
+      expect(sendTimingArgs[2]).toEqual(expectedLoadTime)
+
+      const addTimingArgs = Reporter.addTiming.mostRecentCall.args
+      expect(addTimingArgs[0]).toEqual('load')
+      expect(addTimingArgs[1]).toEqual(expectedLoadTime)
+      expect(addTimingArgs[2]).toEqual({category: 'core'})
     })
   })
 
@@ -262,28 +331,28 @@ describe('Metrics', async () => {
 
     describe('when there are paths in the exception', () => {
       it('strips unix paths surrounded in quotes', () => {
-        let message = "Error: ENOENT, unlink '/Users/someguy/path/file.js'"
+        let message = "Error: ENOENT, unlink '/Users/someuser/path/file.js'"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: ENOENT, unlink <path>')
       })
 
       it('strips unix paths without quotes', () => {
-        let message = 'Uncaught Error: spawn /Users/someguy.omg/path/file-09238_ABC-Final-Final.js ENOENT'
+        let message = 'Uncaught Error: spawn /Users/someuser.omg/path/file-09238_ABC-Final-Final.js ENOENT'
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: spawn <path> ENOENT')
       })
 
       it('strips windows paths without quotes', () => {
-        let message = 'Uncaught Error: spawn c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT'
+        let message = 'Uncaught Error: spawn c:\\someuser.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT'
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: spawn <path> ENOENT')
       })
 
       it('strips windows paths surrounded in quotes', () => {
-        let message = "Uncaught Error: EACCES 'c:\\someguy.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
+        let message = "Uncaught Error: EACCES 'c:\\someuser.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
         window.onerror(message, 2, 3, {ok: true})
         let url = Reporter.request.mostRecentCall.args[0]
         expect(decodeURIComponent(url)).toContain('exd=Error: EACCES <path>')
@@ -300,7 +369,8 @@ describe('Metrics', async () => {
     it('reports a deprecation with metadata specified', async () => {
       Reporter.request.reset()
       jasmine.snapshotDeprecations()
-      grim.deprecate('bad things are bad', {packageName: 'somepackage'})
+      const deprecationMessage = 'bad things are bad'
+      grim.deprecate(deprecationMessage, {packageName: 'somepackage'})
       jasmine.restoreDeprecationsSnapshot()
 
       await conditionPromise(() => Reporter.request.callCount > 0)
@@ -310,6 +380,16 @@ describe('Metrics', async () => {
       expect(url).toContain('ec=deprecation')
       expect(url).toContain('ea=somepackage%40unknown')
       expect(url).toContain('el=bad%20things%20are%20bad')
+
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
+      const args = Reporter.addCustomEvent.mostRecentCall.args
+      expect(args[0]).toEqual('deprecation-v3')
+
+      const eventObject = args[1]
+      expect(eventObject.t).toEqual('event')
+      expect(eventObject.ec).toEqual('deprecation-v3')
+      expect(eventObject.ea).toEqual('somepackage@unknown')
+      expect(eventObject.el).toEqual(deprecationMessage)
     })
 
     it('reports a deprecation without metadata specified', async () => {
@@ -350,29 +430,35 @@ describe('Metrics', async () => {
   })
 
   describe('reporting pane items', async () => {
-    describe('when the user is NOT chosen to send events', async () => {
+    describe('when shouldIncludePanesAndCommands is false', async () => {
       beforeEach(async () => {
         spyOn(Reporter, 'sendPaneItem')
+        spyOn(Reporter, 'sendEvent')
 
         const {mainModule} = await atom.packages.activatePackage('metrics')
+
         mainModule.shouldIncludePanesAndCommands = false
 
         await conditionPromise(() => Reporter.request.callCount > 0)
       })
 
       it('will not report pane items', async () => {
-        await atom.workspace.open('file1.txt')
+        Reporter.sendEvent.reset()
+        await atom.packages.emitter.emit('did-add-pane')
 
         expect(Reporter.sendPaneItem.callCount).toBe(0)
+        expect(Reporter.sendEvent.callCount).toBe(0)
+        expect(Reporter.addCustomEvent.callCount).toBe(0)
       })
     })
 
-    describe('when the user IS chosen to send events', async () => {
+    describe('when shouldIncludePanesAndCommands is true', async () => {
       beforeEach(async () => {
         const {mainModule} = await atom.packages.activatePackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true
 
         await conditionPromise(() => Reporter.request.callCount > 0)
+        await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
       })
 
       it('will report pane items', async () => {
@@ -416,6 +502,16 @@ describe('Metrics', async () => {
               url.includes('ev=1')
           })
         })
+        await conditionPromise(() => {
+          return Reporter.addCustomEvent.calls.find((call) => {
+            const eventType = call.args[0]
+            const eventObject = call.args[1]
+            return eventType === 'package' &&
+             eventObject.t === 'event' &&
+             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
+             eventObject.ev === 1
+          })
+        })
       })
 
       afterEach(() => {
@@ -440,6 +536,16 @@ describe('Metrics', async () => {
               url.includes('ec=package') &&
               url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
               url.includes('ev=0')
+          })
+        })
+        await conditionPromise(() => {
+          return Reporter.addCustomEvent.calls.find((call) => {
+            const eventName = call.args[0]
+            const eventObject = call.args[1]
+            return eventName === 'package' &&
+             eventObject.t === 'event' &&
+             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
+             eventObject.ev === 0
           })
         })
       })
@@ -472,6 +578,7 @@ describe('Metrics', async () => {
       await atom.packages.activatePackage('metrics').then(pack => {
         reporterService = pack.mainModule.provideReporter()
       })
+
       await conditionPromise(() => Reporter.request.callCount > 0)
       Reporter.request.reset()
     })
@@ -480,6 +587,36 @@ describe('Metrics', async () => {
       it('makes a request', () => {
         reporterService.sendEvent('cat', 'action', 'label')
         expect(Reporter.request).toHaveBeenCalled()
+      })
+    )
+
+    describe('::addCustomEvent', () =>
+      it('adds a custom event', () => {
+        spyOn(store, 'addCustomEvent')
+        const args = ['yass queen!', { woo: 'hoo' }]
+        reporterService.addCustomEvent(...args)
+        expect(store.addCustomEvent).toHaveBeenCalledWith(...args)
+      })
+    )
+
+    describe('::incrementCounter', () =>
+      it('increments a counter', () => {
+        spyOn(store, 'incrementCounter')
+        const counterName = 'commits'
+        reporterService.incrementCounter(counterName)
+        expect(store.incrementCounter).toHaveBeenCalledWith(counterName)
+      })
+    )
+
+    describe('::addTiming', () =>
+      it('sends timing to StatsStore', () => {
+        spyOn(store, 'addTiming')
+        const eventType = 'appStart'
+        const timingInMilliseconds = 42
+        const metadata = {glitter: 'beard'}
+        const args = [eventType, timingInMilliseconds, metadata]
+        reporterService.addTiming(eventType, timingInMilliseconds, metadata)
+        expect(store.addTiming).toHaveBeenCalledWith(...args)
       })
     )
 
