@@ -2,7 +2,7 @@
 
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers' // eslint-disable-line no-unused-vars
 import Reporter from '../lib/reporter'
-import store from '../lib/store'
+import store from '../lib/reporter'
 import grim from 'grim'
 import path from 'path'
 
@@ -20,6 +20,7 @@ describe('Metrics', async () => {
 
     spyOn(Reporter, 'request')
     spyOn(Reporter, 'addCustomEvent').andCallThrough()
+    spyOn(Reporter, 'getStore').andCallThrough()
 
     let storage = {}
     spyOn(global.localStorage, 'setItem').andCallFake((key, value) => { storage[key] = value })
