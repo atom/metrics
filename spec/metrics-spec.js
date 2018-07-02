@@ -2,9 +2,12 @@
 
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers' // eslint-disable-line no-unused-vars
 import Reporter from '../lib/reporter'
-import store from '../lib/store'
 import grim from 'grim'
 import path from 'path'
+
+const telemetry = require('telemetry-github')
+
+const store = new telemetry.StatsStore('atom', '1.2.3', true)
 
 describe('Metrics', async () => {
   let workspaceElement = []
@@ -20,6 +23,7 @@ describe('Metrics', async () => {
 
     spyOn(Reporter, 'request')
     spyOn(Reporter, 'addCustomEvent').andCallThrough()
+    spyOn(Reporter, 'getStore').andCallFake(() => store)
 
     let storage = {}
     spyOn(global.localStorage, 'setItem').andCallFake((key, value) => { storage[key] = value })
