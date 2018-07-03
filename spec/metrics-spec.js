@@ -588,6 +588,10 @@ describe('Metrics', async () => {
           })
         })
       })
+
+      afterEach(() => {
+        atom.keymaps.destroy()
+      })
     })
 
     describe('when no user-defined key bindings are present', () => {
@@ -620,6 +624,10 @@ describe('Metrics', async () => {
              eventObject.ev === 0
           })
         })
+      })
+
+      afterEach(() => {
+        atom.keymaps.destroy()
       })
     })
   })
