@@ -556,6 +556,74 @@ describe('Metrics', async () => {
     })
   })
 
+  describe('reporting presence of user-defined key bindings', async () => {
+    describe('when user-defined key bindings are present', () => {
+      it('reports the number of user-defined key bindings loaded at startup', async () => {
+        await atom.packages.activatePackage('metrics')
+
+        // Manually trigger the keymap loading that Atom performs at startup.
+        // (We don't want to weigh down this test with running through the
+        // entire Atom startup process.)
+        const keymapFixturePath = path.join(__dirname, 'fixtures', 'keymaps', 'custom-keymap.cson')
+        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn(keymapFixturePath)
+        atom.keymaps.loadUserKeymap()
+
+        await conditionPromise(() => {
+          return Reporter.request.calls.find((call) => {
+            const url = call.args[0]
+            return url.includes('t=event') &&
+              url.includes('ec=key-binding') &&
+              url.includes('ea=numberUserDefinedKeyBindingsLoadedAtStartup') &&
+              url.includes('ev=3')
+          })
+        })
+        await conditionPromise(() => {
+          return Reporter.addCustomEvent.calls.find((call) => {
+            const eventType = call.args[0]
+            const eventObject = call.args[1]
+            return eventType === 'key-binding' &&
+             eventObject.t === 'event' &&
+             eventObject.ea === 'numberUserDefinedKeyBindingsLoadedAtStartup' &&
+             eventObject.ev === 3
+          })
+        })
+      })
+    })
+
+    describe('when no user-defined key bindings are present', () => {
+      it('reports that zero user-defined key bindings were loaded', async () => {
+        await atom.packages.activatePackage('metrics')
+
+        // Manually trigger the keymap loading that Atom performs at startup.
+        // (We don't want to weigh down this test with running through the
+        // entire Atom startup process.)
+        const keymapFixturePath = path.join(__dirname, 'fixtures', 'keymaps', 'default-keymap.cson')
+        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn(keymapFixturePath)
+        atom.keymaps.loadUserKeymap()
+
+        await conditionPromise(() => {
+          return Reporter.request.calls.find((call) => {
+            const url = call.args[0]
+            return url.includes('t=event') &&
+              url.includes('ec=key-binding') &&
+              url.includes('ea=numberUserDefinedKeyBindingsLoadedAtStartup') &&
+              url.includes('ev=0')
+          })
+        })
+        await conditionPromise(() => {
+          return Reporter.addCustomEvent.calls.find((call) => {
+            const eventType = call.args[0]
+            const eventObject = call.args[1]
+            return eventType === 'key-binding' &&
+             eventObject.t === 'event' &&
+             eventObject.ea === 'numberUserDefinedKeyBindingsLoadedAtStartup' &&
+             eventObject.ev === 0
+          })
+        })
+      })
+    })
+  })
+
   describe('when deactivated', async () =>
     it('stops reporting pane items', async () => {
       global.localStorage.setItem('metrics.userId', 'd')
