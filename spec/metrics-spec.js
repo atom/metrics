@@ -9,8 +9,9 @@ const telemetry = require('telemetry-github')
 
 const store = new telemetry.StatsStore('atom', '1.2.3', true)
 
-describe('Metrics', async () => {
+describe('Metrics', () => {
   let workspaceElement = []
+
   const assertCommandNotReported = (commandName, additionalArgs) => {
     Reporter.request.reset()
 
@@ -18,6 +19,32 @@ describe('Metrics', async () => {
     expect(Reporter.request).not.toHaveBeenCalled()
     expect(Reporter.addCustomEvent).not.toHaveBeenCalled()
   }
+
+  const eventReportedPromise = ({category, action, value}) => {
+    const googleAnalyticsPromise = conditionPromise(() => {
+      return Reporter.request.calls.find((call) => {
+        const url = call.args[0]
+        return url.includes('t=event') &&
+          url.includes(`ec=${category}`) &&
+          url.includes(`ea=${action}`) &&
+          url.includes(`ev=${value}`)
+      })
+    })
+
+    const telemetryPromise = conditionPromise(() => {
+      return Reporter.addCustomEvent.calls.find((call) => {
+        const eventType = call.args[0]
+        const eventObject = call.args[1]
+        return eventType === category &&
+          eventObject.t === 'event' &&
+          eventObject.ea === action &&
+          eventObject.ev === value
+      })
+    })
+
+    return Promise.all([googleAnalyticsPromise, telemetryPromise])
+  }
+
   beforeEach(() => {
     workspaceElement = atom.views.getView(atom.workspace)
 
@@ -476,7 +503,7 @@ describe('Metrics', async () => {
     })
   })
 
-  describe('reporting activation of optional packages', async () => {
+  describe('reporting activation of optional packages', () => {
     describe('when optional packages are present', () => {
       let originalPackageDirPaths = atom.packages.packageDirPaths
 
@@ -497,24 +524,10 @@ describe('Metrics', async () => {
         // overhead of actually load _all_ packages.)
         atom.packages.emitter.emit('did-activate-initial-packages')
 
-        await conditionPromise(() => {
-          return Reporter.request.calls.find((call) => {
-            const url = call.args[0]
-            return url.includes('t=event') &&
-              url.includes('ec=package') &&
-              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
-              url.includes('ev=1')
-          })
-        })
-        await conditionPromise(() => {
-          return Reporter.addCustomEvent.calls.find((call) => {
-            const eventType = call.args[0]
-            const eventObject = call.args[1]
-            return eventType === 'package' &&
-             eventObject.t === 'event' &&
-             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
-             eventObject.ev === 1
-          })
+        await eventReportedPromise({
+          'category': 'package',
+          'action': 'numberOptionalPackagesActivatedAtStartup',
+          'value': 1
         })
       })
 
@@ -533,25 +546,59 @@ describe('Metrics', async () => {
         // overhead of actually load _all_ packages.)
         atom.packages.emitter.emit('did-activate-initial-packages')
 
-        await conditionPromise(() => {
-          return Reporter.request.calls.find((call) => {
-            const url = call.args[0]
-            return url.includes('t=event') &&
-              url.includes('ec=package') &&
-              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
-              url.includes('ev=0')
-          })
+        await eventReportedPromise({
+          'category': 'package',
+          'action': 'numberOptionalPackagesActivatedAtStartup',
+          'value': 0
         })
-        await conditionPromise(() => {
-          return Reporter.addCustomEvent.calls.find((call) => {
-            const eventName = call.args[0]
-            const eventObject = call.args[1]
-            return eventName === 'package' &&
-             eventObject.t === 'event' &&
-             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
-             eventObject.ev === 0
-          })
+      })
+    })
+  })
+
+  describe('reporting presence of user-defined key bindings', () => {
+    describe('when user-defined key bindings are present', () => {
+      it('reports the number of user-defined key bindings loaded at startup', async () => {
+        await atom.packages.activatePackage('metrics')
+
+        // Manually trigger the keymap loading that Atom performs at startup.
+        // (We don't want to weigh down this test with running through the
+        // entire Atom startup process.)
+        const keymapFixturePath = path.join(__dirname, 'fixtures', 'keymaps', 'custom-keymap.cson')
+        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn(keymapFixturePath)
+        atom.keymaps.loadUserKeymap()
+
+        await eventReportedPromise({
+          'category': 'key-binding',
+          'action': 'numberUserDefinedKeyBindingsLoadedAtStartup',
+          'value': 3
         })
+      })
+
+      afterEach(() => {
+        atom.keymaps.destroy()
+      })
+    })
+
+    describe('when no user-defined key bindings are present', () => {
+      it('reports that zero user-defined key bindings were loaded', async () => {
+        await atom.packages.activatePackage('metrics')
+
+        // Manually trigger the keymap loading that Atom performs at startup.
+        // (We don't want to weigh down this test with running through the
+        // entire Atom startup process.)
+        const keymapFixturePath = path.join(__dirname, 'fixtures', 'keymaps', 'default-keymap.cson')
+        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn(keymapFixturePath)
+        atom.keymaps.loadUserKeymap()
+
+        await eventReportedPromise({
+          'category': 'key-binding',
+          'action': 'numberUserDefinedKeyBindingsLoadedAtStartup',
+          'value': 0
+        })
+      })
+
+      afterEach(() => {
+        atom.keymaps.destroy()
       })
     })
   })
