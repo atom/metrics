@@ -9,7 +9,7 @@ const telemetry = require('telemetry-github')
 
 const store = new telemetry.StatsStore('atom', '1.2.3', true)
 
-describe('Metrics', async () => {
+describe('Metrics', () => {
   let workspaceElement = []
   const assertCommandNotReported = (commandName, additionalArgs) => {
     Reporter.request.reset()
@@ -476,7 +476,7 @@ describe('Metrics', async () => {
     })
   })
 
-  describe('reporting activation of optional packages', async () => {
+  describe('reporting activation of optional packages', () => {
     describe('when optional packages are present', () => {
       let originalPackageDirPaths = atom.packages.packageDirPaths
 
@@ -556,7 +556,7 @@ describe('Metrics', async () => {
     })
   })
 
-  describe('reporting presence of user-defined key bindings', async () => {
+  describe('reporting presence of user-defined key bindings', () => {
     describe('when user-defined key bindings are present', () => {
       it('reports the number of user-defined key bindings loaded at startup', async () => {
         await atom.packages.activatePackage('metrics')
