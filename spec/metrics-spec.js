@@ -11,6 +11,7 @@ const store = new telemetry.StatsStore('atom', '1.2.3', true)
 
 describe('Metrics', () => {
   let workspaceElement = []
+
   const assertCommandNotReported = (commandName, additionalArgs) => {
     Reporter.request.reset()
 
@@ -18,6 +19,32 @@ describe('Metrics', () => {
     expect(Reporter.request).not.toHaveBeenCalled()
     expect(Reporter.addCustomEvent).not.toHaveBeenCalled()
   }
+
+  const eventReportedPromise = ({category, action, value}) => {
+    const googleAnalyticsPromise = conditionPromise(() => {
+      return Reporter.request.calls.find((call) => {
+        const url = call.args[0]
+        return url.includes('t=event') &&
+          url.includes(`ec=${category}`) &&
+          url.includes(`ea=${action}`) &&
+          url.includes(`ev=${value}`)
+      })
+    })
+
+    const telemetryPromise = conditionPromise(() => {
+      return Reporter.addCustomEvent.calls.find((call) => {
+        const eventType = call.args[0]
+        const eventObject = call.args[1]
+        return eventType === category &&
+          eventObject.t === 'event' &&
+          eventObject.ea === action &&
+          eventObject.ev === value
+      })
+    })
+
+    return Promise.all([googleAnalyticsPromise, telemetryPromise])
+  }
+
   beforeEach(() => {
     workspaceElement = atom.views.getView(atom.workspace)
 
@@ -497,24 +524,10 @@ describe('Metrics', () => {
         // overhead of actually load _all_ packages.)
         atom.packages.emitter.emit('did-activate-initial-packages')
 
-        await conditionPromise(() => {
-          return Reporter.request.calls.find((call) => {
-            const url = call.args[0]
-            return url.includes('t=event') &&
-              url.includes('ec=package') &&
-              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
-              url.includes('ev=1')
-          })
-        })
-        await conditionPromise(() => {
-          return Reporter.addCustomEvent.calls.find((call) => {
-            const eventType = call.args[0]
-            const eventObject = call.args[1]
-            return eventType === 'package' &&
-             eventObject.t === 'event' &&
-             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
-             eventObject.ev === 1
-          })
+        await eventReportedPromise({
+          'category': 'package',
+          'action': 'numberOptionalPackagesActivatedAtStartup',
+          'value': 1
         })
       })
 
@@ -533,24 +546,10 @@ describe('Metrics', () => {
         // overhead of actually load _all_ packages.)
         atom.packages.emitter.emit('did-activate-initial-packages')
 
-        await conditionPromise(() => {
-          return Reporter.request.calls.find((call) => {
-            const url = call.args[0]
-            return url.includes('t=event') &&
-              url.includes('ec=package') &&
-              url.includes('ea=numberOptionalPackagesActivatedAtStartup') &&
-              url.includes('ev=0')
-          })
-        })
-        await conditionPromise(() => {
-          return Reporter.addCustomEvent.calls.find((call) => {
-            const eventName = call.args[0]
-            const eventObject = call.args[1]
-            return eventName === 'package' &&
-             eventObject.t === 'event' &&
-             eventObject.ea === 'numberOptionalPackagesActivatedAtStartup' &&
-             eventObject.ev === 0
-          })
+        await eventReportedPromise({
+          'category': 'package',
+          'action': 'numberOptionalPackagesActivatedAtStartup',
+          'value': 0
         })
       })
     })
@@ -568,24 +567,10 @@ describe('Metrics', () => {
         spyOn(atom.keymaps, 'getUserKeymapPath').andReturn(keymapFixturePath)
         atom.keymaps.loadUserKeymap()
 
-        await conditionPromise(() => {
-          return Reporter.request.calls.find((call) => {
-            const url = call.args[0]
-            return url.includes('t=event') &&
-              url.includes('ec=key-binding') &&
-              url.includes('ea=numberUserDefinedKeyBindingsLoadedAtStartup') &&
-              url.includes('ev=3')
-          })
-        })
-        await conditionPromise(() => {
-          return Reporter.addCustomEvent.calls.find((call) => {
-            const eventType = call.args[0]
-            const eventObject = call.args[1]
-            return eventType === 'key-binding' &&
-             eventObject.t === 'event' &&
-             eventObject.ea === 'numberUserDefinedKeyBindingsLoadedAtStartup' &&
-             eventObject.ev === 3
-          })
+        await eventReportedPromise({
+          'category': 'key-binding',
+          'action': 'numberUserDefinedKeyBindingsLoadedAtStartup',
+          'value': 3
         })
       })
 
@@ -605,24 +590,10 @@ describe('Metrics', () => {
         spyOn(atom.keymaps, 'getUserKeymapPath').andReturn(keymapFixturePath)
         atom.keymaps.loadUserKeymap()
 
-        await conditionPromise(() => {
-          return Reporter.request.calls.find((call) => {
-            const url = call.args[0]
-            return url.includes('t=event') &&
-              url.includes('ec=key-binding') &&
-              url.includes('ea=numberUserDefinedKeyBindingsLoadedAtStartup') &&
-              url.includes('ev=0')
-          })
-        })
-        await conditionPromise(() => {
-          return Reporter.addCustomEvent.calls.find((call) => {
-            const eventType = call.args[0]
-            const eventObject = call.args[1]
-            return eventType === 'key-binding' &&
-             eventObject.t === 'event' &&
-             eventObject.ea === 'numberUserDefinedKeyBindingsLoadedAtStartup' &&
-             eventObject.ev === 0
-          })
+        await eventReportedPromise({
+          'category': 'key-binding',
+          'action': 'numberUserDefinedKeyBindingsLoadedAtStartup',
+          'value': 0
         })
       })
 
