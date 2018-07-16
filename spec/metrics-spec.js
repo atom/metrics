@@ -2,8 +2,12 @@
 
 import {it, fit, ffit, fffit, beforeEach, afterEach, conditionPromise} from './helpers/async-spec-helpers' // eslint-disable-line no-unused-vars
 import Reporter from '../lib/reporter'
+import fs from 'fs-plus'
 import grim from 'grim'
 import path from 'path'
+import temp from 'temp'
+
+temp.track()
 
 const telemetry = require('telemetry-github')
 
@@ -27,7 +31,7 @@ describe('Metrics', () => {
         return url.includes('t=event') &&
           url.includes(`ec=${category}`) &&
           url.includes(`ea=${action}`) &&
-          url.includes(`ev=${value}`)
+          (url.includes(`ev=${value}`) || value == null)
       })
     })
 
@@ -599,6 +603,27 @@ describe('Metrics', () => {
 
       afterEach(() => {
         atom.keymaps.destroy()
+      })
+    })
+  })
+
+  describe('reporting customization of user init script', () => {
+    it('reports event when init script changes', async () => {
+      const tempDir = fs.realpathSync(temp.mkdirSync())
+      const userInitScriptPath = path.join(tempDir, 'init.js')
+      fs.writeFileSync(userInitScriptPath, '')
+
+      spyOn(atom, 'getUserInitScriptPath').andReturn(userInitScriptPath)
+
+      await atom.packages.activatePackage('metrics')
+
+      const editor = await atom.workspace.open(userInitScriptPath)
+      editor.setText("console.log('hello world')")
+      editor.save()
+
+      await eventReportedPromise({
+        'category': 'customization',
+        'action': 'userInitScriptChanged'
       })
     })
   })
