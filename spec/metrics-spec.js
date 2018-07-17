@@ -703,7 +703,7 @@ describe('Metrics', () => {
       })
     )
 
-    describe('::sendTiming', () =>
+    describe('::setGitHubUser', () =>
       it('sets the gitHubUser', () => {
         spyOn(store, 'setGitHubUser');
         const gitHubUser = 'beyonce'
