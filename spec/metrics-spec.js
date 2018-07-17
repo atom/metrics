@@ -703,6 +703,15 @@ describe('Metrics', () => {
       })
     )
 
+    describe('::setGitHubUser', () =>
+      it('sets the gitHubUser', () => {
+        spyOn(store, 'setGitHubUser')
+        const gitHubUser = 'beyonce'
+        reporterService.setGitHubUser(gitHubUser)
+        expect(store.setGitHubUser).toHaveBeenCalledWith(gitHubUser)
+      })
+    )
+
     describe('::sendException', () =>
       it('makes a request', () => {
         reporterService.sendException('desc')
