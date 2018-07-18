@@ -507,6 +507,45 @@ describe('Metrics', () => {
     })
   })
 
+  describe('reporting repositories', () => {
+    it('reports when a repository gets opened', async () => {
+      // TODO Once atom.project.observeRepositories ships to Atom's stable
+      // channel (likely in Atom 1.30), remove this guard, and update the atom
+      // engine version in package.json to the first Atom version that includes
+      // atom.project.observeRepositories
+      if (atom.project.observeRepositories == null) return
+
+      await atom.packages.activatePackage('metrics')
+      Reporter.addCustomEvent.reset()
+      Reporter.request.reset()
+
+      const repositoryPath = path.join(__dirname, '..')
+      atom.project.addPath(repositoryPath)
+
+      const telemetryPromise = conditionPromise(() => {
+        return Reporter.addCustomEvent.calls.find((call) => {
+          const eventType = call.args[0]
+          const eventObject = call.args[1]
+          return eventType === 'repository' &&
+            eventObject.action === 'open' &&
+            eventObject.domain === 'github.com'
+        })
+      })
+
+      const googleAnalyticsPromise = conditionPromise(() => {
+        return Reporter.request.calls.find((call) => {
+          const url = call.args[0]
+          return url.includes('t=event') &&
+            url.includes('ec=repository') &&
+            url.includes('ea=open') &&
+            url.includes('el=github.com')
+        })
+      })
+
+      await Promise.all([telemetryPromise, googleAnalyticsPromise])
+    })
+  })
+
   describe('reporting activation of optional packages', () => {
     describe('when optional packages are present', () => {
       let originalPackageDirPaths = atom.packages.packageDirPaths
