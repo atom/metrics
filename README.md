@@ -20,7 +20,7 @@ You will be asked at first-run whether you consent to telemetry being sent to th
 * Amount of time the app took to launch
 * Deprecated package names and versions
 * Chrome user-agent (version of Chrome, OS, CPU)
-* The number of non-core Atom packages that have been activated
+* The number of optional (non-bundled) Atom packages activated at startup
 
 This information is sent via [Google Analytics][GA] which allows the Atom team to analyze usage patterns and errors in order to help improve Atom.
 
