@@ -628,6 +628,27 @@ describe('Metrics', () => {
     })
   })
 
+  describe('reporting customization of user stylesheet', () => {
+    it('reports event when stylesheet changes', async () => {
+      const tempDir = fs.realpathSync(temp.mkdirSync())
+      const userStylesheetPath = path.join(tempDir, 'styles.less')
+      fs.writeFileSync(userStylesheetPath, '')
+
+      spyOn(atom.styles, 'getUserStyleSheetPath').andReturn(userStylesheetPath)
+
+      await atom.packages.activatePackage('metrics')
+
+      const editor = await atom.workspace.open(userStylesheetPath)
+      editor.setText('atom-pane:not(.active) { opacity: 0.75; }')
+      editor.save()
+
+      await eventReportedPromise({
+        'category': 'customization',
+        'action': 'userStylesheetChanged'
+      })
+    })
+  })
+
   describe('when deactivated', async () =>
     it('stops reporting pane items', async () => {
       global.localStorage.setItem('metrics.userId', 'd')
