@@ -21,6 +21,9 @@ You will be asked at first-run whether you consent to telemetry being sent to th
 * Deprecated package names and versions
 * Chrome user-agent (version of Chrome, OS, CPU)
 * The number of optional (non-bundled) Atom packages activated at startup
+* The number of [user-defined key bindings](https://flight-manual.atom.io/using-atom/sections/basic-customization/#customizing-keybindings) loaded at startup
+* File save events when editing the [user init script](https://flight-manual.atom.io/hacking-atom/sections/the-init-file/)
+* File save events when editing the [user stylesheet](https://flight-manual.atom.io/using-atom/sections/basic-customization/#style-tweaks)
 
 This information is sent via [Google Analytics][GA] which allows the Atom team to analyze usage patterns and errors in order to help improve Atom.
 
