@@ -478,6 +478,7 @@ describe('Metrics', () => {
       })
 
       it('will not report pane items', async () => {
+        Reporter.addCustomEvent.reset()
         Reporter.sendEvent.reset()
         await atom.packages.emitter.emit('did-add-pane')
 
