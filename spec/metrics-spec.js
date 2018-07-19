@@ -91,12 +91,12 @@ describe('Metrics', () => {
   it('reports events', async () => {
     jasmine.useRealClock()
     await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount === 2)
+    await conditionPromise(() => Reporter.request.callCount > 0)
 
     Reporter.request.reset()
     await atom.packages.deactivatePackage('metrics')
     await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount === 3)
+    await conditionPromise(() => Reporter.request.callCount > 0)
 
     let url = Reporter.request.calls[0].args[0]
     expect(url).toBeDefined()
