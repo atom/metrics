@@ -91,12 +91,12 @@ describe('Metrics', () => {
   it('reports events', async () => {
     jasmine.useRealClock()
     await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount === 2)
+    await conditionPromise(() => Reporter.request.callCount > 0)
 
     Reporter.request.reset()
     await atom.packages.deactivatePackage('metrics')
     await atom.packages.activatePackage('metrics')
-    await conditionPromise(() => Reporter.request.callCount === 3)
+    await conditionPromise(() => Reporter.request.callCount > 0)
 
     let url = Reporter.request.calls[0].args[0]
     expect(url).toBeDefined()
@@ -478,6 +478,7 @@ describe('Metrics', () => {
       })
 
       it('will not report pane items', async () => {
+        Reporter.addCustomEvent.reset()
         Reporter.sendEvent.reset()
         await atom.packages.emitter.emit('did-add-pane')
 
@@ -504,6 +505,45 @@ describe('Metrics', () => {
         })
         expect(paneItemCalls.length).toBe(1)
       })
+    })
+  })
+
+  describe('reporting repositories', () => {
+    it('reports when a repository gets opened', async () => {
+      // TODO Once atom.project.observeRepositories ships to Atom's stable
+      // channel (likely in Atom 1.30), remove this guard, and update the atom
+      // engine version in package.json to the first Atom version that includes
+      // atom.project.observeRepositories
+      if (atom.project.observeRepositories == null) return
+
+      await atom.packages.activatePackage('metrics')
+      Reporter.addCustomEvent.reset()
+      Reporter.request.reset()
+
+      const repositoryPath = path.join(__dirname, '..')
+      atom.project.addPath(repositoryPath)
+
+      const telemetryPromise = conditionPromise(() => {
+        return Reporter.addCustomEvent.calls.find((call) => {
+          const eventType = call.args[0]
+          const eventObject = call.args[1]
+          return eventType === 'repository' &&
+            eventObject.action === 'open' &&
+            eventObject.domain === 'github.com'
+        })
+      })
+
+      const googleAnalyticsPromise = conditionPromise(() => {
+        return Reporter.request.calls.find((call) => {
+          const url = call.args[0]
+          return url.includes('t=event') &&
+            url.includes('ec=repository') &&
+            url.includes('ea=open') &&
+            url.includes('el=github.com')
+        })
+      })
+
+      await Promise.all([telemetryPromise, googleAnalyticsPromise])
     })
   })
 
