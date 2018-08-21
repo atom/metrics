@@ -319,7 +319,7 @@ describe('Metrics', () => {
   describe('reporting deprecations', async () => {
     beforeEach(async () => {
       await atom.packages.activatePackage('metrics')
-      // await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
     })
 
     it('reports a deprecation with metadata specified', async () => {
@@ -365,17 +365,12 @@ describe('Metrics', () => {
 
       jasmine.restoreDeprecationsSnapshot()
 
-      // await conditionPromise(() => Reporter.request.callCount > 0)
-      // await eventReportedPromise({
-      //   'category': 'deprecation',
-      //   'action': 'numberOptionalPackagesActivatedAtStartup',
-      //   'value': 'bad things are bad'
-      // })
-      // let url = Reporter.request.mostRecentCall.args[0]
-      // expect(url).toContain('t=event')
-      // expect(url).toContain('ec=deprecation')
-      // expect(url).toMatch(/ea=metrics%40[0-9]+\.[0-9]+\.[0-9]+/)
-      // expect(url).toContain('el=bad%20things%20are%20bad')
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
+      const args = Reporter.addCustomEvent.mostRecentCall.args
+      expect(args[0]).toEqual('deprecation-v3')
+      const event = args[1]
+      expect(event.ec).toEqual('deprecation-v3')
+      expect(event.el).toEqual('bad things are bad')
     })
   })
 
