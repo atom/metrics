@@ -174,7 +174,7 @@ describe('Metrics', () => {
       beforeEach(async () => {
         global.localStorage.setItem('metrics.userId', 'a')
         await atom.packages.activatePackage('metrics')
-        // await conditionPromise(() => Reporter.request.callCount > 0)
+
         await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
 
         const {mainModule} = atom.packages.getLoadedPackage('metrics')
@@ -261,22 +261,23 @@ describe('Metrics', () => {
   })
 
   describe('reporting exceptions', async () => {
+    const assertException = function(args, expectedMessage) {
+      expect(args[0]).toEqual('exception')
+      const event = args[1]
+      expect(event.exd).toContain(expectedMessage)
+    }
     beforeEach(async () => {
       spyOn(atom, 'openDevTools').andReturn(Promise.resolve())
       spyOn(atom, 'executeJavaScriptInDevTools')
       await atom.packages.activatePackage('metrics')
-      // todo: make this actually test addCustomEvent
-      // await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
     })
 
     it('reports an exception with the correct type', () => {
       let message = "Uncaught TypeError: Cannot call method 'getScreenRow' of undefined"
       window.onerror(message, 'abc', 2, 3, {ok: true})
 
-      // todo: make this actually test addCustomEvent
-      // let url = Reporter.request.mostRecentCall.args[0]
-      // expect(url).toContain('t=exception')
-      // expect(url).toContain('exd=TypeError')
+      assertException(Reporter.addCustomEvent.mostRecentCall.args, 'TypeError')
     })
 
     describe('when the message has no clear type', () =>
@@ -284,9 +285,7 @@ describe('Metrics', () => {
         let message = ''
         window.onerror(message, 2, 3, {ok: true})
 
-        // let url = Reporter.request.mostRecentCall.args[0]
-        // expect(url).toContain('t=exception')
-        // expect(url).toContain('exd=Unknown')
+        assertException(Reporter.addCustomEvent.mostRecentCall.args, 'Unknown')
       })
     )
 
@@ -294,29 +293,25 @@ describe('Metrics', () => {
       it('strips unix paths surrounded in quotes', () => {
         let message = "Error: ENOENT, unlink '/Users/someuser/path/file.js'"
         window.onerror(message, 2, 3, {ok: true})
-        // let url = Reporter.request.mostRecentCall.args[0]
-        // expect(decodeURIComponent(url)).toContain('exd=Error: ENOENT, unlink <path>')
+        assertException(Reporter.addCustomEvent.mostRecentCall.args, 'Error: ENOENT, unlink <path>')
       })
 
       it('strips unix paths without quotes', () => {
         let message = 'Uncaught Error: spawn /Users/someuser.omg/path/file-09238_ABC-Final-Final.js ENOENT'
         window.onerror(message, 2, 3, {ok: true})
-        // let url = Reporter.request.mostRecentCall.args[0]
-        // expect(decodeURIComponent(url)).toContain('exd=Error: spawn <path> ENOENT')
+        assertException(Reporter.addCustomEvent.mostRecentCall.args, 'Error: spawn <path> ENOENT')
       })
 
       it('strips windows paths without quotes', () => {
         let message = 'Uncaught Error: spawn c:\\someuser.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js ENOENT'
         window.onerror(message, 2, 3, {ok: true})
-        // let url = Reporter.request.mostRecentCall.args[0]
-        // expect(decodeURIComponent(url)).toContain('exd=Error: spawn <path> ENOENT')
+        assertException(Reporter.addCustomEvent.mostRecentCall.args, 'Error: spawn <path> ENOENT')
       })
 
       it('strips windows paths surrounded in quotes', () => {
         let message = "Uncaught Error: EACCES 'c:\\someuser.omg\\path\\file-09238_ABC-Fin%%$#()al-Final.js'"
         window.onerror(message, 2, 3, {ok: true})
-        // let url = Reporter.request.mostRecentCall.args[0]
-        // expect(decodeURIComponent(url)).toContain('exd=Error: EACCES <path>')
+        assertException(Reporter.addCustomEvent.mostRecentCall.args, 'Error: EACCES <path>')
       })
     })
   })
