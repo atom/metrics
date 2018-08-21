@@ -617,14 +617,14 @@ describe('Metrics', () => {
     })
 
     describe('::sendEvent', () =>
-      it('makes a request', () => {
+      it('sends an event', () => {
         reporterService.sendEvent('cat', 'action', 'label')
-        // expect(Reporter.request).toHaveBeenCalled()
+        expect(Reporter.addCustomEvent).toHaveBeenCalled()
       })
     )
 
     describe('::addCustomEvent', () =>
-      it('adds a custom event', () => {
+      it('adds a custom event to the StatsStore', () => {
         spyOn(store, 'addCustomEvent')
         const args = ['yass queen!', { woo: 'hoo' }]
         reporterService.addCustomEvent(...args)
@@ -654,16 +654,16 @@ describe('Metrics', () => {
     )
 
     describe('::sendTiming', () =>
-      it('sends an event to telemetry', () => {
+      it('sends timing', () => {
         reporterService.sendEvent('cat', 'name')
-        // expect(Reporter.request).toHaveBeenCalled()
+        expect(Reporter.addCustomEvent).toHaveBeenCalled()
       })
     )
 
     describe('::sendException', () =>
-      it('sends an exception to telemetry', () => {
+      it('sends an exception', () => {
         reporterService.sendException('desc')
-        // expect(Reporter.request).toHaveBeenCalled()
+        expect(Reporter.addCustomEvent).toHaveBeenCalled()
       })
     )
   })
