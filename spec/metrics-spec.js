@@ -593,17 +593,18 @@ describe('Metrics', () => {
 
       const {mainModule} = await atom.packages.activatePackage('metrics')
       mainModule.shouldIncludePanesAndCommands = true
-      // await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
 
       await atom.workspace.open('file1.txt')
-      //todo: make this actually test addCustomEvent
-      // await conditionPromise(() => Reporter.request.callCount > 0)
+      await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
 
       Reporter.sendPaneItem.reset()
+      Reporter.addCustomEvent.reset()
       await atom.packages.deactivatePackage('metrics')
       await atom.workspace.open('file2.txt')
 
       expect(Reporter.sendPaneItem.callCount).toBe(0)
+      expect(Reporter.addCustomEvent.callCount).toBe(0)
     })
   )
 
