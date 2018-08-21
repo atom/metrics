@@ -29,3 +29,4 @@ You will be asked at first-run whether you consent to telemetry being sent to th
 This information is sent to GitHub's internal analytics pipeline via the [`telemetry`][Telemetry] package which allows the Atom team to analyze usage patterns and errors in order to help improve Atom.
 
 [Telemetry]: https://github.com/atom/telemetry
+[RFC4122]: http://www.ietf.org/rfc/rfc4122.txt
