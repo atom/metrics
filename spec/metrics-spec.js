@@ -384,7 +384,7 @@ describe('Metrics', () => {
 
         mainModule.shouldIncludePanesAndCommands = false
 
-        // await conditionPromise(() => Reporter.request.callCount > 0)
+        await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
       })
 
       it('will not report pane items', async () => {
@@ -403,17 +403,17 @@ describe('Metrics', () => {
         const {mainModule} = await atom.packages.activatePackage('metrics')
         mainModule.shouldIncludePanesAndCommands = true
 
-        // await conditionPromise(() => Reporter.request.callCount > 0)
         await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
       })
 
       it('will report pane items', async () => {
         await atom.workspace.open('file1.txt')
-        // const paneItemCalls = Reporter.request.calls.filter((call) => {
-        //   const url = call.args[0]
-        //   return url.includes('t=appview') && url.includes('cd=TextEditor')
-        // })
-        // expect(paneItemCalls.length).toBe(1)
+        const paneItemCalls = Reporter.addCustomEvent.calls.filter((call) => {
+          const eventType = call.args[0]
+          const event = call.args[1]
+          return eventType == 'appview' && event.cd && 'TextEditor'
+        })
+        expect(paneItemCalls.length).toBe(1)
       })
     })
   })
