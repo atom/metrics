@@ -23,7 +23,7 @@ describe('Metrics', () => {
   }
 
     const eventReportedPromise = ({category, action, value}) => {
-    const telemetryPromise = conditionPromise(() => {
+    return conditionPromise(() => {
       return Reporter.addCustomEvent.calls.find((call) => {
         const eventType = call.args[0]
         const eventObject = call.args[1]
@@ -33,8 +33,6 @@ describe('Metrics', () => {
           eventObject.ev === value
       })
     })
-    // clean this up - we probably don't need Promise.all here
-    return Promise.all([telemetryPromise])
   }
 
   beforeEach(() => {
@@ -444,7 +442,7 @@ describe('Metrics', () => {
       const repositoryPath = path.join(__dirname, '..')
       atom.project.addPath(repositoryPath)
 
-      const telemetryPromise = conditionPromise(() => {
+      await conditionPromise(() => {
         return Reporter.addCustomEvent.calls.find((call) => {
           const eventType = call.args[0]
           const eventObject = call.args[1]
@@ -453,8 +451,6 @@ describe('Metrics', () => {
             eventObject.domain === 'github.com'
         })
       })
-
-      await Promise.all([telemetryPromise])
     })
   })
 
