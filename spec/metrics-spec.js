@@ -17,12 +17,11 @@ describe('Metrics', () => {
   let workspaceElement = []
 
   const assertCommandNotReported = (commandName, additionalArgs) => {
-
     atom.commands.dispatch(workspaceElement, commandName, additionalArgs)
     expect(Reporter.addCustomEvent).not.toHaveBeenCalled()
   }
 
-    const eventReportedPromise = ({category, action, value}) => {
+  const eventReportedPromise = ({category, action, value}) => {
     return conditionPromise(() => {
       return Reporter.addCustomEvent.calls.find((call) => {
         const eventType = call.args[0]
@@ -261,7 +260,7 @@ describe('Metrics', () => {
   })
 
   describe('reporting exceptions', async () => {
-    const assertException = function(args, expectedMessage) {
+    const assertException = function (args, expectedMessage) {
       expect(args[0]).toEqual('exception')
       const event = args[1]
       expect(event.exd).toContain(expectedMessage)
@@ -411,7 +410,7 @@ describe('Metrics', () => {
         const paneItemCalls = Reporter.addCustomEvent.calls.filter((call) => {
           const eventType = call.args[0]
           const event = call.args[1]
-          return eventType == 'appview' && event.cd && 'TextEditor'
+          return eventType === 'appview' && event.cd === 'TextEditor'
         })
         expect(paneItemCalls.length).toBe(1)
       })
