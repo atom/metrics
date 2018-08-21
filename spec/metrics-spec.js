@@ -382,13 +382,12 @@ describe('Metrics', () => {
         const {mainModule} = await atom.packages.activatePackage('metrics')
 
         mainModule.shouldIncludePanesAndCommands = false
-
-        await conditionPromise(() => Reporter.addCustomEvent.callCount > 0)
       })
 
       it('will not report pane items', async () => {
         Reporter.addCustomEvent.reset()
         Reporter.sendEvent.reset()
+        Reporter.sendPaneItem.reset()
         await atom.packages.emitter.emit('did-add-pane')
 
         expect(Reporter.sendPaneItem.callCount).toBe(0)
