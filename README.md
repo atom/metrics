@@ -26,7 +26,7 @@ You will be asked at first-run whether you consent to telemetry being sent to th
 * File save events when editing the [user stylesheet](https://flight-manual.atom.io/using-atom/sections/basic-customization/#style-tweaks)
 * Repository open events and the hostname from the repository's URL (i.e., `github.com`, `bitbucket.org`, `gitlab.com`, `visualstudio.com`, `amazonaws.com` if the repository is hosted at one of these domains; otherwise, the hostname is anonymized as `other`)
 
-This information is sent via [Google Analytics][GA] which allows the Atom team to analyze usage patterns and errors in order to help improve Atom.
+This information is sent to GitHub's internal analytics pipeline via the [`telemetry`][Telemetry] package which allows the Atom team to analyze usage patterns and errors in order to help improve Atom.
 
-[GA]: http://www.google.com/analytics
+[Telemetry]: https://github.com/atom/telemetry
 [RFC4122]: http://www.ietf.org/rfc/rfc4122.txt
