@@ -21,7 +21,7 @@
     "telemetry-github": "0.0.13"
   },
   "devDependencies": {
-    "standard": "*",
+    "standard": "^11.0.1",
     "temp": "^0.8.3"
   },
   "standard": {
