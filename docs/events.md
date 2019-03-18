@@ -30,21 +30,25 @@ Timing events log the duration that a specific action took plus some metadata th
 
 #### Window load time ([more info](https://atom.io/docs/api/v1.35.1/AtomEnvironment#instance-getWindowLoadTime))
 
-| field | value |
-|-------|------|
-| `eventType` | `core`
-| `metadata.t` | `event`
-| `metadata.ec` | `core`
-| `metadata.ea` | `load`
+* **eventType**: `core`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `core`
+  | `ea` | `load`
 
 #### Shell load time
 
-| field | value |
-|-------|------|
-| `eventType` | `shell`
-| `metadata.t` | `event`
-| `metadata.ec` | `shell`
-| `metadata.ea` | `load`
+* **eventType**: `shell`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `shell`
+  | `ea` | `load`
 
 ## Standard events
 
@@ -58,125 +62,148 @@ Standard events have a free form and can log any data in its `metadata` object. 
 
 #### Window start/end events
 
-| field | value |
-|-------|------|
-| `eventType` | `window`
-| `metadata.t` | `event`
-| `metadata.ec` | `window`
-| `metadata.ea` | `started`
+* **eventType**: `window`
+* **metadata**
 
-| field | value |
-|-------|------|
-| `eventType` | `window`
-| `metadata.t` | `event`
-| `metadata.ec` | `window`
-| `metadata.ea` | `ended`
-| `metadata.ev` | Session duration (in ms).
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `window`
+  | `ea` | `started`
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `window`
+  | `ea` | `ended`
+  | `ev` | Session duration (in ms).
 
 #### Open repository
 
-| field | value |
-|-------|------|
-| `eventType` | `repository`
-| `metadata.action` | `open`
-| `metadata.domain` | `github.com` \| `gitlab.com` \| `bitbucket.org` \| `visualstudio.com` \| `amazonaws.com` \| `other`
+* **eventType**: `repository`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `action` | `open`
+  | `domain` | `github.com` \| `gitlab.com` \| `bitbucket.org` \| `visualstudio.com` \| `amazonaws.com` \| `other`
 
 #### Open file
 
-| field | value |
-|-------|------|
-| `eventType` | `file`
-| `metadata.t` | `event`
-| `metadata.ec` | `file`
-| `metadata.ea` | `open`
-| `metadata.el` | `source.${grammarType}`
+* **eventType**: `file`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `file`
+  | `ea` | `open`
+  | `el` | `source.${grammarType}`
 
 #### Execute Atom command
 
-| field | value |
-|-------|------|
-| `eventType` | `command`
-| `metadata.t` | `event`
-| `metadata.ec` | `command`
-| `metadata.ea` | First part of the command (until the colon).
-| `metadata.el` | Executed command
-| `metadata.ev` | Number of times that command has been executed in this session.
+* **eventType**: `command`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `command`
+  | `ea` | First part of the command (until the colon).
+  | `el` | Executed command
+  | `ev` | Number of times that command has been executed in this session.
 
 #### Pane item added
 
-| field | value |
-|-------|------|
-| `eventType` | `appview`
-| `metadata.t` | `appview`
-| `metadata.cd` | Pane item name.
-| `metadata.dt` | Pane item grammar.
+* **eventType**: `appview`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `appview`
+  | `cd` | Pane item name.
+  | `dt` | Pane item grammar.
 
 #### Number of packages installed
 
-| field | value |
-|-------|------|
-| `eventType` | `package`
-| `metadata.t` | `event`
-| `metadata.ec` | `package`
-| `metadata.ea` | `numberOptionalPackagesActivatedAtStartup`
-| `metadata.ev` | The number of non-bundled active packages at startup.
+* **eventType**: `package`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `package`
+  | `ea` | `numberOptionalPackagesActivatedAtStartup`
+  | `ev` | The number of non-bundled active packages at startup.
 
 #### Number of custom keybindings
 
-| field | value |
-|-------|------|
-| `eventType` | `key-binding`
-| `metadata.t` | `event`
-| `metadata.ec` | `key-binding`
-| `metadata.ea` | `numberUserDefinedKeyBindingsLoadedAtStartup`
-| `metadata.ev` | The number of custom key bindings.
+* **eventType**: `key-binding`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `key-binding`
+  | `ea` | `numberUserDefinedKeyBindingsLoadedAtStartup`
+  | `ev` | The number of custom key bindings.
 
 #### Modify init script file
 
-| field | value |
-|-------|------|
-| `eventType` | `customization`
-| `metadata.t` | `event`
-| `metadata.ec` | `customization`
-| `metadata.ea` | `userInitScriptChanged`
+* **eventType**: `customization`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `customization`
+  | `ea` | `userInitScriptChanged`
 
 #### Modify user stylesheet
 
-| field | value |
-|-------|------|
-| `eventType` | `customization`
-| `metadata.t` | `event`
-| `metadata.ec` | `customization`
-| `metadata.ea` | `userStylesheetChanged`
+* **eventType**: `customization`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `customization`
+  | `ea` | `userStylesheetChanged`
 
 #### Metrics consents change
 
-| field | value |
-|-------|------|
-| `eventType` | `setting`
-| `metadata.t` | `event`
-| `metadata.ec` | `setting`
-| `metadata.ea` | `core.telemetryConsent`
-| `metadata.el` | `limited` \| `no`
+* **eventType**: `setting`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `setting`
+  | `ea` | `core.telemetryConsent`
+  | `el` | `limited` \| `no`
 
 #### Deprecation API usage
 
-| field | value |
-|-------|------|
-| `eventType` | `deprecation-v3`
-| `metadata.t` | `event`
-| `metadata.ec` | `deprecation-v3`
-| `metadata.ea` | `${packageName}@${version}` (e.g `settings@1.9.2`).
-| `metadata.el` | deprecation message.
+* **eventType**: `deprecation-v3`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `t` | `event`
+  | `ec` | `deprecation-v3`
+  | `ea` | `${packageName}@${version}` (e.g `settings@1.9.2`).
+  | `el` | deprecation message.
 
 #### Non-captured error
 
-| field | value |
-|-------|------|
-| `eventType` | `exception`
-| `metadata.t` | `exception`
-| `metadata.exd` | Exception stack trace.
-| `metadata.exf` | `0` | `1` (whether Atom is in Dev mode).
+* **eventType**: `exception`
+* **metadata**
+
+  | field | value |
+  |-------|------|
+  | `metadata.t` | `exception`
+  | `exd` | Exception stack trace.
+  | `exf` | `0` \| `1` (whether Atom is in Dev mode).
 
 ## Common metadata fields
 
