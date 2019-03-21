@@ -4,9 +4,9 @@ This document specifies all the data (along with the format) which gets send fro
 
 This does not include data that's logged by packages on other repositories. Here are links to the events specs of these packages:
 
-* **GitHub package**: TBD.
 * **Welcome package**: [spec](https://github.com/atom/welcome/blob/master/docs/events.md).
 * **Fuzzy finder package**: [spec](https://github.com/atom/fuzzy-finder/blob/master/docs/events.md).
+* **GitHub package**: TBD.
 
 ## Type of events
 
