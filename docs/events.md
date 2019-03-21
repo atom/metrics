@@ -1,6 +1,12 @@
 # Events specification
 
-This document specifies all the data (along with the format) which gets send from the Atom editor core to the GitHub analytics pipeline. This does not include data that's logged by packages, like [the GitHub package](https://github.com/search?q=incrementCounter+repo%3Aatom%2Fgithub+path%3Alib&type=Code) or [the welcome package](https://github.com/search?q=sendEvent+repo%3Aatom%2Fwelcome+path%3Alib&type=Code).
+This document specifies all the data (along with the format) which gets send from the Atom editor core to the GitHub analytics pipeline.
+
+This does not include data that's logged by packages on other repositories. Here are links to the events specs of these packages:
+
+* **GitHub package**: TBD.
+* **Welcome package**: TBD.
+* **Fuzzy finder package**: [spec](https://github.com/atom/fuzzy-finder/blob/master/docs/events.md).
 
 ## Type of events
 
