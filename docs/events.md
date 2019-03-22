@@ -1,6 +1,6 @@
 # Events specification
 
-This document specifies all the data (along with the format) which gets send from the Atom editor core to the GitHub analytics pipeline.
+This document specifies all the data (along with the format) which gets sent from the Atom editor core to the GitHub analytics pipeline.
 
 This does not include data that's logged by packages on other repositories. Here are links to the events specs of these packages:
 
@@ -20,7 +20,7 @@ There are 3 different types of events:
 
 These events are used to count how many times a certain action happens. They don't hold any metadata and they only log the name of the counter and the number of times it was incremented.
 
-Currently Atom core is not logging any counter event, but the [GitHub package](https://github.com/atom/github) is using counters to log things like the number of created PRs.
+Currently Atom core is not logging any counter events, but the [GitHub package](https://github.com/atom/github) is using counters to log things like the number of created PRs.
 
 ## Timing events
 
