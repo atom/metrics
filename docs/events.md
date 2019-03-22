@@ -36,25 +36,21 @@ Timing events log the duration that a specific action took plus some metadata th
 
 #### Window load time ([more info](https://atom.io/docs/api/v1.35.1/AtomEnvironment#instance-getWindowLoadTime))
 
-* **eventType**: `core`
+* **eventType**: `load`
 * **metadata**
 
   | field | value |
   |-------|-------|
-  | `t` | `event`
   | `ec` | `core`
-  | `ea` | `load`
 
 #### Shell load time
 
-* **eventType**: `shell`
+* **eventType**: `load`
 * **metadata**
 
   | field | value |
   |-------|-------|
-  | `t` | `event`
   | `ec` | `shell`
-  | `ea` | `load`
 
 ## Standard events
 

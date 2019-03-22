@@ -243,19 +243,14 @@ describe('Metrics', () => {
   describe('reporting timings', async () => {
     it('reports timing metrics', async () => {
       spyOn(Reporter, 'addTiming')
-      spyOn(Reporter, 'sendTiming').andCallThrough()
+
       await atom.packages.activatePackage('metrics')
       const expectedLoadTime = atom.getWindowLoadTime()
-
-      const sendTimingArgs = Reporter.sendTiming.mostRecentCall.args
-      expect(sendTimingArgs[0]).toEqual('core')
-      expect(sendTimingArgs[1]).toEqual('load')
-      expect(sendTimingArgs[2]).toEqual(expectedLoadTime)
 
       const addTimingArgs = Reporter.addTiming.mostRecentCall.args
       expect(addTimingArgs[0]).toEqual('load')
       expect(addTimingArgs[1]).toEqual(expectedLoadTime)
-      expect(addTimingArgs[2]).toEqual({category: 'core'})
+      expect(addTimingArgs[2]).toEqual({ec: 'core'})
     })
   })
 
@@ -648,13 +643,6 @@ describe('Metrics', () => {
         const args = [eventType, timingInMilliseconds, metadata]
         reporterService.addTiming(eventType, timingInMilliseconds, metadata)
         expect(store.addTiming).toHaveBeenCalledWith(...args)
-      })
-    )
-
-    describe('::sendTiming', () =>
-      it('sends timing', () => {
-        reporterService.sendEvent('cat', 'name')
-        expect(Reporter.addCustomEvent).toHaveBeenCalled()
       })
     )
 
