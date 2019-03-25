@@ -35,6 +35,36 @@
       "atom"
     ]
   },
+  "configSchema": {
+    "dev": {
+      "title": "Development Settings",
+      "description": "Please refresh the Atom window after modifying any setting in this section.",
+      "type": "object",
+      "properties": {
+        "verboseMode": {
+          "title": "Verbose mode",
+          "type": "boolean",
+          "default": false,
+          "description": "When set to `true`, any performed request containing metrics will be logged in console.",
+          "order": 1
+        },
+        "sendMetricsInDevMode": {
+          "title": "Send metrics in Dev mode",
+          "type": "boolean",
+          "default": false,
+          "description": "By default, Atom does not log anything in Dev mode. Set this param to `true` to log events in dev mode.",
+          "order": 2
+        },
+        "reportingFrequency": {
+          "title": "Reporting frequency",
+          "type": "number",
+          "default": 1440,
+          "description": "How often does Atom send metrics to GitHub (in minutes). By default it's once a day.",
+          "order": 3
+        }
+      }
+    }
+  },
   "scripts": {
     "lint": "standard --verbose",
     "test": "npm run lint && apm test"
