@@ -52,6 +52,19 @@ Timing events log the duration that a specific action took plus some metadata th
   |-------|-------|
   | `ec` | `shell`
 
+#### Startup markers
+
+We're logging a bunch of markers to understand where is the startup time spent in Atom.
+
+A list of all the markers can be found by using [GitHub search](https://github.com/atom/atom/search?q=StartupTime.addMarker%28&unscoped_q=StartupTime.addMarker%28).
+
+* **eventType**: `startup`
+* **metadata**
+
+  | field | value |
+  |-------|-------|
+  | `ec` | Label of the marker
+
 ## Standard events
 
 Standard events have a free form and can log any data in its `metadata` object. These are the most commonly used types of events.
