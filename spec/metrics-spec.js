@@ -247,7 +247,7 @@ describe('Metrics', () => {
       await atom.packages.activatePackage('metrics')
       const expectedLoadTime = atom.getWindowLoadTime()
 
-      const addTimingArgs = Reporter.addTiming.mostRecentCall.args
+      const addTimingArgs = Reporter.addTiming.calls[0].args
       expect(addTimingArgs[0]).toEqual('load')
       expect(addTimingArgs[1]).toEqual(expectedLoadTime)
       expect(addTimingArgs[2]).toEqual({ec: 'core'})
