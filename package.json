@@ -18,7 +18,7 @@
   "dependencies": {
     "fs-plus": "^3.0.0",
     "grim": "^2.0.1",
-    "telemetry-github": "0.1.0"
+    "telemetry-github": "0.1.1"
   },
   "devDependencies": {
     "standard": "^11.0.1",
