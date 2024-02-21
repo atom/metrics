@@ -413,12 +413,6 @@ describe('Metrics', () => {
 
   describe('reporting repositories', () => {
     it('reports when a repository gets opened', async () => {
-      // TODO Once atom.project.observeRepositories ships to Atom's stable
-      // channel (likely in Atom 1.30), remove this guard, and update the atom
-      // engine version in package.json to the first Atom version that includes
-      // atom.project.observeRepositories
-      if (atom.project.observeRepositories == null) return
-
       await atom.packages.activatePackage('metrics')
       Reporter.addCustomEvent.reset()
 
